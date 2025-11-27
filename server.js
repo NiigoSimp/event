@@ -4,7 +4,6 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const cors = require('cors');
 const path = require('path');
-require('dotenv').config();
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -155,6 +154,8 @@ const authorize = (...roles) => {
         next();
     };
 };
+
+// ==================== 15 REQUIRED FUNCTIONS ====================
 
 // 1. Lấy danh sách sự kiện sắp diễn ra
 app.get('/api/events/upcoming', async (req, res) => {
@@ -777,7 +778,7 @@ app.post('/api/auth/register', async (req, res) => {
         const token = jwt.sign(
             { id: user._id },
             process.env.JWT_SECRET || 'fallback-secret-key',
-            { expiresIn: process.env.JWT_EXPIRES_IN || '30d' }
+            { expiresIn: '30d' }
         );
 
         res.status(201).json({
@@ -830,7 +831,7 @@ app.post('/api/auth/login', async (req, res) => {
         const token = jwt.sign(
             { id: user._id },
             process.env.JWT_SECRET || 'fallback-secret-key',
-            { expiresIn: process.env.JWT_EXPIRES_IN || '30d' }
+            { expiresIn: '30d' }
         );
 
         res.json({
@@ -971,14 +972,29 @@ app.get('/api/admin/dashboard', protect, authorize('admin'), async (req, res) =>
     }
 });
 
+// API Home
+app.get('/api', (req, res) => {
+    res.json({
+        message: 'Event Management API',
+        version: '1.0.0',
+        endpoints: {
+            auth: '/api/auth',
+            events: '/api/events',
+            users: '/api/users',
+            admin: '/api/admin'
+        }
+    });
+});
+
+// Serve frontend for all other routes
 app.get('*', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
 // Start server
 app.listen(PORT, () => {
-    console.log('Success');
     console.log(`Server running on port ${PORT}`);
     console.log(`Frontend: http://localhost:${PORT}`);
     console.log(`API: http://localhost:${PORT}/api`);
+
 });

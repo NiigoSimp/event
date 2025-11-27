@@ -1,7 +1,7 @@
 {
-  "name": "event-management-fullstack",
+  "name": "event-management-system",
   "version": "1.0.0",
-  "description": "Complete Event Management System",
+  "description": "Event Management System with MongoDB",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
@@ -15,10 +15,15 @@
     "cors": "^2.8.5",
     "dotenv": "^16.3.1"
   },
-  "devDependencies": {
-    "nodemon": "^3.0.1"
-  },
   "engines": {
     "node": ">=14.0.0"
-  }
+  },
+  "keywords": [
+    "event",
+    "management",
+    "mongodb",
+    "express"
+  ],
+  "author": "Your Name",
+  "license": "MIT"
 }
