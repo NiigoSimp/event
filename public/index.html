@@ -1,0 +1,747 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Event Management System</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; background: #f4f4f4; }
+
+        .navbar { background: #2c3e50; color: white; padding: 1rem 0; }
+        .nav-container { max-width: 1200px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; padding: 0 2rem; }
+        .logo { font-size: 1.8rem; font-weight: bold; }
+        .nav-links { display: flex; gap: 2rem; }
+        .nav-link { color: white; text-decoration: none; padding: 0.5rem 1rem; border-radius: 4px; transition: background-color 0.3s; }
+        .nav-link:hover { background-color: #34495e; }
+
+        .container { max-width: 1200px; margin: 2rem auto; padding: 0 2rem; }
+        .section { display: none; }
+        .section.active { display: block; }
+
+        .hero { text-align: center; padding: 4rem 0; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border-radius: 10px; margin-bottom: 2rem; }
+        .hero h2 { font-size: 3rem; margin-bottom: 1rem; }
+        .hero p { font-size: 1.2rem; margin-bottom: 2rem; }
+
+        .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 2rem; margin: 2rem 0; }
+        .stat-card { background: white; padding: 2rem; border-radius: 8px; text-align: center; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .stat-card h3 { font-size: 2.5rem; color: #3498db; margin-bottom: 0.5rem; }
+
+        .btn-primary { background: #3498db; color: white; padding: 0.8rem 2rem; border: none; border-radius: 5px; cursor: pointer; font-size: 1rem; transition: background-color 0.3s; }
+        .btn-primary:hover { background: #2980b9; }
+        .btn-secondary { background: #95a5a6; color: white; padding: 0.8rem 2rem; border: none; border-radius: 5px; cursor: pointer; font-size: 1rem; transition: background-color 0.3s; }
+        .btn-secondary:hover { background: #7f8c8d; }
+        .btn-success { background: #27ae60; color: white; padding: 0.8rem 2rem; border: none; border-radius: 5px; cursor: pointer; font-size: 1rem; transition: background-color 0.3s; }
+        .btn-success:hover { background: #219a52; }
+
+        .filters { display: flex; gap: 1rem; margin-bottom: 2rem; flex-wrap: wrap; }
+        .filters input, .filters select { padding: 0.8rem; border: 1px solid #ddd; border-radius: 5px; font-size: 1rem; }
+
+        .events-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 2rem; }
+        .event-card { background: white; border-radius: 8px; padding: 1.5rem; box-shadow: 0 2px 10px rgba(0,0,0,0.1); transition: transform 0.3s; }
+        .event-card:hover { transform: translateY(-5px); }
+        .event-card h3 { color: #2c3e50; margin-bottom: 1rem; }
+        .event-card p { margin-bottom: 0.5rem; color: #666; }
+        .event-price { font-size: 1.2rem; font-weight: bold; color: #27ae60; }
+        .event-category { display: inline-block; padding: 0.3rem 0.8rem; border-radius: 20px; font-size: 0.8rem; font-weight: bold; background: #e8f4fd; color: #2980b9; margin-bottom: 1rem; }
+
+        .auth-form { max-width: 600px; margin: 2rem auto; background: white; padding: 2rem; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .form-group { margin-bottom: 1.5rem; }
+        .form-group label { display: block; margin-bottom: 0.5rem; font-weight: bold; }
+        .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 0.8rem; border: 1px solid #ddd; border-radius: 5px; font-size: 1rem; }
+        .form-group textarea { height: 100px; resize: vertical; }
+        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+
+        .profile-info, .ticket-card { background: white; padding: 1.5rem; border-radius: 8px; margin-bottom: 1rem; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+
+        .admin-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 2rem; }
+        .admin-actions { display: flex; gap: 1rem; margin-bottom: 2rem; flex-wrap: wrap; }
+        .admin-data { background: white; padding: 1.5rem; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+
+        .category-buttons { display: flex; gap: 1rem; margin-bottom: 2rem; flex-wrap: wrap; }
+        .category-btn { background: #ecf0f1; border: 2px solid #bdc3c7; padding: 0.8rem 1.5rem; border-radius: 5px; cursor: pointer; transition: all 0.3s; }
+        .category-btn.active { background: #3498db; color: white; border-color: #2980b9; }
+        .category-btn:hover { background: #d5dbdb; }
+
+        .message { padding: 1rem; border-radius: 5px; margin: 1rem 0; }
+        .error { background: #f8d7da; color: #721c24; }
+        .success { background: #d4edda; color: #155724; }
+        .info { background: #d1ecf1; color: #0c5460; }
+
+        .loading { text-align: center; padding: 2rem; color: #666; }
+
+        @media (max-width: 768px) {
+            .nav-container { flex-direction: column; gap: 1rem; }
+            .nav-links { flex-wrap: wrap; justify-content: center; }
+            .hero h2 { font-size: 2rem; }
+            .filters { flex-direction: column; }
+            .admin-actions { flex-direction: column; }
+            .form-row { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+<nav class="navbar">
+    <div class="nav-container">
+        <h1 class="logo">EventHub</h1>
+        <div class="nav-links">
+            <a href="#" class="nav-link" onclick="showSection('home')">Home</a>
+            <a href="#" class="nav-link" onclick="showSection('events')">Events</a>
+            <a href="#" class="nav-link" onclick="showSection('login')" id="loginLink">Login</a>
+            <a href="#" class="nav-link" onclick="showSection('register')" id="registerLink">Register</a>
+            <a href="#" class="nav-link" onclick="logout()" id="logoutLink" style="display: none;">Logout</a>
+            <a href="#" class="nav-link" onclick="showSection('admin')" id="adminLink" style="display: none;">Admin</a>
+            <a href="#" class="nav-link" onclick="showSection('create-event')" id="createEventLink" style="display: none;">Create Event</a>
+            <a href="#" class="nav-link" onclick="showSection('profile')" id="profileLink" style="display: none;">Profile</a>
+        </div>
+    </div>
+</nav>
+
+<div class="container">
+    <!-- Home Section -->
+    <section id="home" class="section active">
+        <div class="hero">
+            <h2>Welcome to EventHub</h2>
+            <p>Discover amazing events and book your tickets easily</p>
+            <button class="btn-primary" onclick="showSection('events')">Browse Events</button>
+        </div>
+
+        <div class="stats">
+            <div class="stat-card">
+                <h3 id="totalEvents">0</h3>
+                <p>Total Events</p>
+            </div>
+            <div class="stat-card">
+                <h3 id="upcomingEvents">0</h3>
+                <p>Upcoming Events</p>
+            </div>
+            <div class="stat-card">
+                <h3 id="totalUsers">0</h3>
+                <p>Registered Users</p>
+            </div>
+        </div>
+
+        <div class="info" style="padding: 1rem; border-radius: 5px; margin: 2rem 0;">
+            <h3>Demo Admin Account</h3>
+            <p><strong>Email:</strong> thehollow2008@gmail.com</p>
+            <p><strong>Password:</strong> NiigoS1tg</p>
+            <p>Use this account to create events and access admin features.</p>
+        </div>
+    </section>
+
+    <!-- Events Section -->
+    <section id="events" class="section">
+        <h2>All Events</h2>
+        <div class="filters">
+            <input type="text" id="searchInput" placeholder="Search events..." onkeyup="searchEvents()">
+            <select id="categoryFilter" onchange="filterEvents()">
+                <option value="">All Categories</option>
+            </select>
+            <button class="btn-secondary" onclick="loadEvents()">Refresh</button>
+        </div>
+
+        <div class="category-buttons" id="categoryButtons">
+            <!-- Category buttons will be loaded here -->
+        </div>
+
+        <div id="eventsList" class="events-grid"></div>
+    </section>
+
+    <!-- Create Event Section -->
+    <section id="create-event" class="section">
+        <div class="auth-form">
+            <h2>Create New Event</h2>
+            <form onsubmit="createEvent(event)">
+                <div class="form-group">
+                    <label>Event Title *</label>
+                    <input type="text" id="eventTitle" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Description *</label>
+                    <textarea id="eventDescription" required></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label>Category *</label>
+                    <select id="eventCategory" required>
+                        <option value="">Select Category</option>
+                        <option value="Technology">Technology</option>
+                        <option value="Music">Music</option>
+                        <option value="Business">Business</option>
+                        <option value="Sports">Sports</option>
+                        <option value="Education">Education</option>
+                        <option value="Arts">Arts & Culture</option>
+                        <option value="Food">Food & Drink</option>
+                        <option value="Health">Health & Wellness</option>
+                        <option value="Other">Other</option>
+                    </select>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Venue *</label>
+                        <input type="text" id="eventVenue" required>
+                    </div>
+                    <div class="form-group">
+                        <label>City *</label>
+                        <input type="text" id="eventCity" required>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Country *</label>
+                    <input type="text" id="eventCountry" required>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Start Date & Time *</label>
+                        <input type="datetime-local" id="eventStartDate" required>
+                    </div>
+                    <div class="form-group">
+                        <label>End Date & Time *</label>
+                        <input type="datetime-local" id="eventEndDate" required>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Organizer Name *</label>
+                        <input type="text" id="organizerName" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Organizer Email *</label>
+                        <input type="email" id="organizerEmail" required>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Organizer Phone *</label>
+                    <input type="tel" id="organizerPhone" required>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Capacity *</label>
+                        <input type="number" id="eventCapacity" min="1" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Ticket Price ($) *</label>
+                        <input type="number" id="eventPrice" min="0" step="0.01" required>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn-success">Create Event</button>
+            </form>
+        </div>
+    </section>
+
+    <!-- Login Section -->
+    <section id="login" class="section">
+        <div class="auth-form">
+            <h2>Login</h2>
+            <form onsubmit="loginUser(event)">
+                <div class="form-group">
+                    <label>Email:</label>
+                    <input type="email" id="loginEmail" required>
+                </div>
+                <div class="form-group">
+                    <label>Password:</label>
+                    <input type="password" id="loginPassword" required>
+                </div>
+                <button type="submit" class="btn-primary">Login</button>
+            </form>
+            <p>Don't have an account? <a href="#" onclick="showSection('register')">Register here</a></p>
+
+            <div class="info" style="margin-top: 2rem; padding: 1rem;">
+                <h4>Demo Admin Account:</h4>
+                <p><strong>Email:</strong> thehollow2008@gmail.com</p>
+                <p><strong>Password:</strong> NiigoS1tg</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Register Section -->
+    <section id="register" class="section">
+        <div class="auth-form">
+            <h2>Register</h2>
+            <form onsubmit="registerUser(event)">
+                <div class="form-group">
+                    <label>Name:</label>
+                    <input type="text" id="registerName" required>
+                </div>
+                <div class="form-group">
+                    <label>Email:</label>
+                    <input type="email" id="registerEmail" required>
+                </div>
+                <div class="form-group">
+                    <label>Password:</label>
+                    <input type="password" id="registerPassword" required minlength="6">
+                </div>
+                <div class="form-group">
+                    <label>Phone:</label>
+                    <input type="tel" id="registerPhone">
+                </div>
+                <button type="submit" class="btn-primary">Register</button>
+            </form>
+        </div>
+    </section>
+
+    <!-- Profile Section -->
+    <section id="profile" class="section">
+        <div class="profile-container">
+            <h2>My Profile</h2>
+            <div id="profileInfo"></div>
+            <div id="userTickets">
+                <h3>My Tickets</h3>
+                <div id="ticketsList"></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Admin Section -->
+    <section id="admin" class="section">
+        <div class="admin-container">
+            <h2>Admin Dashboard</h2>
+            <div class="admin-stats" id="adminStats"></div>
+            <div class="admin-actions">
+                <button class="btn-primary" onclick="loadAdminStats()">Refresh Stats</button>
+                <button class="btn-secondary" onclick="loadTopEvents()">Top Events</button>
+                <button class="btn-success" onclick="showSection('create-event')">Create New Event</button>
+            </div>
+            <div id="adminData"></div>
+        </div>
+    </section>
+</div>
+
+<script>
+    const API_BASE = window.location.origin + '/api';
+    let currentUser = null;
+    let authToken = null;
+    let categories = [];
+
+    // Initialize
+    document.addEventListener('DOMContentLoaded', function() {
+        checkAuthStatus();
+        loadHomeStats();
+        loadEvents();
+        loadCategories();
+    });
+
+    // Navigation
+    function showSection(sectionId) {
+        document.querySelectorAll('.section').forEach(section => {
+            section.classList.remove('active');
+        });
+        document.getElementById(sectionId).classList.add('active');
+
+        if (sectionId === 'profile' && currentUser) loadProfile();
+        if (sectionId === 'admin' && currentUser?.role === 'admin') loadAdminStats();
+    }
+
+    // Auth Functions
+    async function registerUser(event) {
+        event.preventDefault();
+        const userData = {
+            name: document.getElementById('registerName').value,
+            email: document.getElementById('registerEmail').value,
+            password: document.getElementById('registerPassword').value,
+            phone: document.getElementById('registerPhone').value
+        };
+
+        try {
+            const response = await fetch(`${API_BASE}/auth/register`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(userData)
+            });
+            const data = await response.json();
+            if (data.success) {
+                showMessage('Registration successful! Please login.', 'success');
+                showSection('login');
+                event.target.reset();
+            } else {
+                showMessage(data.message, 'error');
+            }
+        } catch (error) {
+            showMessage('Registration failed. Please try again.', 'error');
+        }
+    }
+
+    async function loginUser(event) {
+        event.preventDefault();
+        const loginData = {
+            email: document.getElementById('loginEmail').value,
+            password: document.getElementById('loginPassword').value
+        };
+
+        try {
+            const response = await fetch(`${API_BASE}/auth/login`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(loginData)
+            });
+            const data = await response.json();
+            if (data.success) {
+                authToken = data.token;
+                currentUser = data.data.user;
+                localStorage.setItem('authToken', authToken);
+                localStorage.setItem('user', JSON.stringify(currentUser));
+                updateNavigation();
+                showMessage('Login successful!', 'success');
+                showSection('home');
+                event.target.reset();
+                loadHomeStats();
+                loadEvents();
+            } else {
+                showMessage(data.message, 'error');
+            }
+        } catch (error) {
+            showMessage('Login failed. Please try again.', 'error');
+        }
+    }
+
+    function logout() {
+        authToken = null;
+        currentUser = null;
+        localStorage.removeItem('authToken');
+        localStorage.removeItem('user');
+        updateNavigation();
+        showSection('home');
+        showMessage('Logged out successfully.', 'success');
+    }
+
+    function checkAuthStatus() {
+        const token = localStorage.getItem('authToken');
+        const user = localStorage.getItem('user');
+        if (token && user) {
+            authToken = token;
+            currentUser = JSON.parse(user);
+            updateNavigation();
+        }
+    }
+
+    function updateNavigation() {
+        const loginLink = document.getElementById('loginLink');
+        const registerLink = document.getElementById('registerLink');
+        const logoutLink = document.getElementById('logoutLink');
+        const adminLink = document.getElementById('adminLink');
+        const createEventLink = document.getElementById('createEventLink');
+        const profileLink = document.getElementById('profileLink');
+
+        if (currentUser) {
+            loginLink.style.display = 'none';
+            registerLink.style.display = 'none';
+            logoutLink.style.display = 'block';
+            profileLink.style.display = 'block';
+
+            if (currentUser.role === 'admin') {
+                adminLink.style.display = 'block';
+                createEventLink.style.display = 'block';
+            } else {
+                adminLink.style.display = 'none';
+                createEventLink.style.display = 'none';
+            }
+        } else {
+            loginLink.style.display = 'block';
+            registerLink.style.display = 'block';
+            logoutLink.style.display = 'none';
+            adminLink.style.display = 'none';
+            createEventLink.style.display = 'none';
+            profileLink.style.display = 'none';
+        }
+    }
+
+    // Event Creation
+    async function createEvent(event) {
+        event.preventDefault();
+
+        if (!currentUser || currentUser.role !== 'admin') {
+            showMessage('Only administrators can create events', 'error');
+            return;
+        }
+
+        const eventData = {
+            title: document.getElementById('eventTitle').value,
+            description: document.getElementById('eventDescription').value,
+            category: document.getElementById('eventCategory').value,
+            venue: document.getElementById('eventVenue').value,
+            city: document.getElementById('eventCity').value,
+            country: document.getElementById('eventCountry').value,
+            startDate: document.getElementById('eventStartDate').value,
+            endDate: document.getElementById('eventEndDate').value,
+            organizerName: document.getElementById('organizerName').value,
+            organizerEmail: document.getElementById('organizerEmail').value,
+            organizerPhone: document.getElementById('organizerPhone').value,
+            capacity: document.getElementById('eventCapacity').value,
+            ticketPrice: document.getElementById('eventPrice').value
+        };
+
+        try {
+            const response = await fetch(`${API_BASE}/events`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${authToken}`
+                },
+                body: JSON.stringify(eventData)
+            });
+
+            const data = await response.json();
+            if (data.success) {
+                showMessage('Event created successfully!', 'success');
+                event.target.reset();
+                loadEvents();
+                loadCategories();
+                showSection('events');
+            } else {
+                showMessage(data.message, 'error');
+            }
+        } catch (error) {
+            showMessage('Failed to create event', 'error');
+        }
+    }
+
+    // Event Functions
+    async function loadEvents() {
+        try {
+            const response = await fetch(`${API_BASE}/events/upcoming`);
+            const data = await response.json();
+            if (data.success) displayEvents(data.data);
+        } catch (error) {
+            showMessage('Failed to load events', 'error');
+        }
+    }
+
+    function displayEvents(events) {
+        const eventsList = document.getElementById('eventsList');
+        if (events.length === 0) {
+            eventsList.innerHTML = `
+                    <div class="loading">
+                        <p>No events found. Create some events to get started!</p>
+                        ${currentUser?.role === 'admin' ?
+                '<button class="btn-success" onclick="showSection(\'create-event\')">Create Event</button>' :
+                '<p>Contact administrator to add events.</p>'
+            }
+                    </div>
+                `;
+            return;
+        }
+        eventsList.innerHTML = events.map(event => `
+                <div class="event-card">
+                    <span class="event-category">${event.category}</span>
+                    <h3>${event.title}</h3>
+                    <p><strong>Description:</strong> ${event.description}</p>
+                    <p><strong>Date:</strong> ${new Date(event.dateTime.start).toLocaleDateString()}</p>
+                    <p><strong>Time:</strong> ${new Date(event.dateTime.start).toLocaleTimeString()} - ${new Date(event.dateTime.end).toLocaleTimeString()}</p>
+                    <p><strong>Location:</strong> ${event.location.venue}, ${event.location.city}</p>
+                    <p><strong>Price:</strong> $<span class="event-price">${event.ticketPrice}</span></p>
+                    <p><strong>Capacity:</strong> ${event.capacity} people</p>
+                    <p><strong>Organizer:</strong> ${event.organizer.name}</p>
+                    <div style="margin-top: 1rem;">
+                        ${currentUser ? `<button class="btn-secondary" onclick="bookTicket('${event._id}')">Book Ticket</button>` : ''}
+                    </div>
+                </div>
+            `).join('');
+    }
+
+    async function loadCategories() {
+        try {
+            const response = await fetch(`${API_BASE}/events/categories`);
+            const data = await response.json();
+            if (data.success) {
+                categories = data.data;
+                displayCategoryButtons();
+                updateCategoryFilter();
+            }
+        } catch (error) {
+            console.error('Failed to load categories');
+        }
+    }
+
+    function displayCategoryButtons() {
+        const categoryButtons = document.getElementById('categoryButtons');
+        if (categories.length === 0) {
+            categoryButtons.innerHTML = '<p>No categories available</p>';
+            return;
+        }
+
+        categoryButtons.innerHTML = `
+                <button class="category-btn active" onclick="filterByCategory('')">All Categories</button>
+                ${categories.map(category => `
+                    <button class="category-btn" onclick="filterByCategory('${category}')">${category}</button>
+                `).join('')}
+            `;
+    }
+
+    function updateCategoryFilter() {
+        const categoryFilter = document.getElementById('categoryFilter');
+        categoryFilter.innerHTML = '<option value="">All Categories</option>' +
+            categories.map(category => `<option value="${category}">${category}</option>`).join('');
+    }
+
+    function filterByCategory(category) {
+        // Update active button
+        document.querySelectorAll('.category-btn').forEach(btn => {
+            btn.classList.remove('active');
+        });
+        event.target.classList.add('active');
+
+        if (!category) {
+            loadEvents();
+            return;
+        }
+
+        // Filter events by category
+        const eventCards = document.querySelectorAll('.event-card');
+        eventCards.forEach(card => {
+            const cardCategory = card.querySelector('.event-category').textContent;
+            card.style.display = cardCategory === category ? 'block' : 'none';
+        });
+    }
+
+    // Profile Functions
+    async function loadProfile() {
+        if (!currentUser) return;
+        try {
+            const response = await fetch(`${API_BASE}/users/${currentUser.id}/profile`, {
+                headers: { 'Authorization': `Bearer ${authToken}` }
+            });
+            const data = await response.json();
+            if (data.success) displayProfile(data.data);
+        } catch (error) {
+            showMessage('Failed to load profile', 'error');
+        }
+    }
+
+    function displayProfile(profileData) {
+        const profileInfo = document.getElementById('profileInfo');
+        const user = profileData.user;
+        profileInfo.innerHTML = `
+                <div class="profile-info">
+                    <h3>Personal Information</h3>
+                    <p><strong>Name:</strong> ${user.name}</p>
+                    <p><strong>Email:</strong> ${user.email}</p>
+                    <p><strong>Role:</strong> ${user.role}</p>
+                    ${user.phone ? `<p><strong>Phone:</strong> ${user.phone}</p>` : ''}
+                    <p><strong>Total Tickets:</strong> ${profileData.ticketStats.totalTickets}</p>
+                </div>
+            `;
+    }
+
+    // Admin Functions
+    async function loadAdminStats() {
+        if (!currentUser || currentUser.role !== 'admin') return;
+        try {
+            const response = await fetch(`${API_BASE}/admin/dashboard`, {
+                headers: { 'Authorization': `Bearer ${authToken}` }
+            });
+            const data = await response.json();
+            if (data.success) displayAdminStats(data.data);
+        } catch (error) {
+            showMessage('Failed to load admin stats', 'error');
+        }
+    }
+
+    function displayAdminStats(stats) {
+        const adminStats = document.getElementById('adminStats');
+        const overview = stats.overview;
+        adminStats.innerHTML = `
+                <div class="stat-card">
+                    <h3>${overview.totalUsers}</h3>
+                    <p>Total Users</p>
+                </div>
+                <div class="stat-card">
+                    <h3>${overview.totalEvents}</h3>
+                    <p>Total Events</p>
+                </div>
+                <div class="stat-card">
+                    <h3>${overview.totalTickets}</h3>
+                    <p>Total Tickets</p>
+                </div>
+                <div class="stat-card">
+                    <h3>$${overview.totalRevenue}</h3>
+                    <p>Total Revenue</p>
+                </div>
+            `;
+
+        // Display events by category
+        const adminData = document.getElementById('adminData');
+        adminData.innerHTML = `
+                <h3>Events by Category</h3>
+                ${stats.eventsByCategory.map(cat => `
+                    <div style="margin: 0.5rem 0; padding: 0.5rem; background: #f8f9fa; border-radius: 5px;">
+                        <strong>${cat._id}:</strong> ${cat.count} events
+                    </div>
+                `).join('')}
+            `;
+    }
+
+    async function loadTopEvents() {
+        try {
+            const response = await fetch(`${API_BASE}/events/top/registered?limit=5`);
+            const data = await response.json();
+            if (data.success) {
+                const adminData = document.getElementById('adminData');
+                adminData.innerHTML = `
+                        <h3>Top 5 Most Registered Events</h3>
+                        ${data.data.length > 0 ? data.data.map((event, index) => `
+                            <div style="margin: 1rem 0; padding: 1rem; background: #f8f9fa; border-radius: 5px;">
+                                <h4>#${index + 1} - ${event.eventName}</h4>
+                                <p>Registrations: ${event.totalRegistrations}</p>
+                            </div>
+                        `).join('') : '<p>No registration data available yet.</p>'}
+                    `;
+            }
+        } catch (error) {
+            showMessage('Failed to load top events', 'error');
+        }
+    }
+
+    // Utility Functions
+    async function loadHomeStats() {
+        try {
+            const eventsResponse = await fetch(`${API_BASE}/events/upcoming`);
+            const eventsData = await eventsResponse.json();
+            if (eventsData.success) {
+                document.getElementById('totalEvents').textContent = eventsData.count;
+                document.getElementById('upcomingEvents').textContent = eventsData.count;
+            }
+            document.getElementById('totalUsers').textContent = 'Loading...';
+        } catch (error) {
+            console.error('Failed to load stats');
+        }
+    }
+
+    function showMessage(message, type) {
+        const existingMessages = document.querySelectorAll('.message');
+        existingMessages.forEach(msg => msg.remove());
+        const messageDiv = document.createElement('div');
+        messageDiv.className = `message ${type}`;
+        messageDiv.textContent = message;
+        const container = document.querySelector('.container');
+        container.insertBefore(messageDiv, container.firstChild);
+        setTimeout(() => messageDiv.remove(), 5000);
+    }
+
+    function searchEvents() {
+        const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+        const eventCards = document.querySelectorAll('.event-card');
+        eventCards.forEach(card => {
+            const title = card.querySelector('h3').textContent.toLowerCase();
+            card.style.display = title.includes(searchTerm) ? 'block' : 'none';
+        });
+    }
+
+    function filterEvents() {
+        const category = document.getElementById('categoryFilter').value;
+        filterByCategory(category);
+    }
+
+    function bookTicket(eventId) {
+        showMessage('Ticket booking feature coming soon!', 'success');
+    }
+</script>
+</body>
+</html>

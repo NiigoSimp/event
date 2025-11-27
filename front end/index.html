@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Event Management System</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<nav class="navbar">
+    <div class="nav-container">
+        <h1 class="logo">EventHub</h1>
+        <div class="nav-links">
+            <a href="#" class="nav-link" onclick="showSection('home')">Home</a>
+            <a href="#" class="nav-link" onclick="showSection('events')">Events</a>
+            <a href="#" class="nav-link" onclick="showSection('login')" id="loginLink">Login</a>
+            <a href="#" class="nav-link" onclick="showSection('register')" id="registerLink">Register</a>
+            <a href="#" class="nav-link" onclick="logout()" id="logoutLink" style="display: none;">Logout</a>
+            <a href="#" class="nav-link" onclick="showSection('admin')" id="adminLink" style="display: none;">Admin</a>
+            <a href="#" class="nav-link" onclick="showSection('profile')" id="profileLink" style="display: none;">Profile</a>
+        </div>
+    </div>
+</nav>
+
+<div class="container">
+    <!-- Home Section -->
+    <section id="home" class="section active">
+        <div class="hero">
+            <h2>Welcome to EventHub</h2>
+            <p>Discover amazing events and book your tickets easily</p>
+            <button class="btn-primary" onclick="showSection('events')">Browse Events</button>
+        </div>
+
+        <div class="stats">
+            <div class="stat-card">
+                <h3 id="totalEvents">0</h3>
+                <p>Total Events</p>
+            </div>
+            <div class="stat-card">
+                <h3 id="upcomingEvents">0</h3>
+                <p>Upcoming Events</p>
+            </div>
+            <div class="stat-card">
+                <h3 id="totalUsers">0</h3>
+                <p>Registered Users</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Events Section -->
+    <section id="events" class="section">
+        <h2>All Events</h2>
+        <div class="filters">
+            <input type="text" id="searchInput" placeholder="Search events..." onkeyup="searchEvents()">
+            <select id="categoryFilter" onchange="filterEvents()">
+                <option value="">All Categories</option>
+            </select>
+            <button class="btn-secondary" onclick="loadEvents()">Refresh</button>
+        </div>
+        <div id="eventsList" class="events-grid"></div>
+    </section>
+
+    <!-- Login Section -->
+    <section id="login" class="section">
+        <div class="auth-form">
+            <h2>Login</h2>
+            <form onsubmit="loginUser(event)">
+                <div class="form-group">
+                    <label>Email:</label>
+                    <input type="email" id="loginEmail" required>
+                </div>
+                <div class="form-group">
+                    <label>Password:</label>
+                    <input type="password" id="loginPassword" required>
+                </div>
+                <button type="submit" class="btn-primary">Login</button>
+            </form>
+            <p>Don't have an account? <a href="#" onclick="showSection('register')">Register here</a></p>
+        </div>
+    </section>
+
+    <!-- Register Section -->
+    <section id="register" class="section">
+        <div class="auth-form">
+            <h2>Register</h2>
+            <form onsubmit="registerUser(event)">
+                <div class="form-group">
+                    <label>Name:</label>
+                    <input type="text" id="registerName" required>
+                </div>
+                <div class="form-group">
+                    <label>Email:</label>
+                    <input type="email" id="registerEmail" required>
+                </div>
+                <div class="form-group">
+                    <label>Password:</label>
+                    <input type="password" id="registerPassword" required minlength="6">
+                </div>
+                <div class="form-group">
+                    <label>Phone:</label>
+                    <input type="tel" id="registerPhone">
+                </div>
+                <button type="submit" class="btn-primary">Register</button>
+            </form>
+        </div>
+    </section>
+
+    <!-- Profile Section -->
+    <section id="profile" class="section">
+        <div class="profile-container">
+            <h2>My Profile</h2>
+            <div id="profileInfo" class="profile-info"></div>
+            <div id="userTickets" class="tickets-section">
+                <h3>My Tickets</h3>
+                <div id="ticketsList"></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Admin Section -->
+    <section id="admin" class="section">
+        <div class="admin-container">
+            <h2>Admin Dashboard</h2>
+            <div class="admin-stats" id="adminStats">
+                <!-- Stats will be loaded here -->
+            </div>
+            <div class="admin-actions">
+                <button class="btn-primary" onclick="loadAdminStats()">Refresh Stats</button>
+                <button class="btn-secondary" onclick="loadPaymentSummary()">Payment Summary</button>
+                <button class="btn-secondary" onclick="loadTopEvents()">Top Events</button>
+            </div>
+            <div id="adminData" class="admin-data">
+                <!-- Admin data will be displayed here -->
+            </div>
+        </div>
+    </section>
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>
