@@ -217,7 +217,6 @@ const authorize = (...roles) => {
     };
 };
 
-// ==================== AUTH ROUTES ====================
 
 app.post('/api/auth/register', async (req, res) => {
     try {
@@ -319,9 +318,7 @@ app.post('/api/auth/login', async (req, res) => {
     }
 });
 
-// ==================== TICKET BUYING ROUTES ====================
 
-// 🎫 COMPREHENSIVE TICKET PURCHASE FUNCTION
 app.post('/api/tickets/purchase', protect, async (req, res) => {
     try {
         console.log('=== TICKET PURCHASE STARTED ===');
@@ -632,9 +629,7 @@ app.post('/api/tickets/:ticketId/cancel', protect, async (req, res) => {
     }
 });
 
-// ==================== EVENT ROUTES ====================
 
-// Get all events
 app.get('/api/events', async (req, res) => {
     try {
         const { page = 1, limit = 10, category, status, search } = req.query;
@@ -684,7 +679,6 @@ app.get('/api/events', async (req, res) => {
     }
 });
 
-// Create New Event - FIXED VERSION
 app.post('/api/events', protect, authorize('admin'), async (req, res) => {
     try {
         console.log('=== EVENT CREATION STARTED ===');
@@ -761,7 +755,6 @@ app.post('/api/events', protect, authorize('admin'), async (req, res) => {
     }
 });
 
-// Get single event by ID
 app.get('/api/events/:id', async (req, res) => {
     try {
         const event = await Event.findById(req.params.id);

@@ -12,8 +12,9 @@ const eventSchema = new mongoose.Schema({
         required: [true, 'Event description is required']
     },
     category: {
-        type: String,
-        required: [true, 'Event category is required']
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Category',
+        required: true
     },
     location: {
         venue: { type: String, required: true },
