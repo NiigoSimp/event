@@ -70,17 +70,14 @@
             color: white;
             border-radius: 10px;
             margin-bottom: 2rem;
-            box-shadow: 0 4px 15px rgba(136, 68, 153, 0.4);
         }
         .hero h2 {
             font-size: 3rem;
             margin-bottom: 1rem;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
         }
         .hero p {
             font-size: 1.2rem;
             margin-bottom: 2rem;
-            opacity: 0.9;
         }
 
         .stats {
@@ -95,7 +92,6 @@
             border-radius: 8px;
             text-align: center;
             box-shadow: 0 2px 10px rgba(136, 68, 153, 0.1);
-            border-left: 4px solid #8888CC;
         }
         .stat-card h3 {
             font-size: 2.5rem;
@@ -112,7 +108,6 @@
             cursor: pointer;
             font-size: 1rem;
             transition: background-color 0.3s;
-            box-shadow: 0 2px 5px rgba(136, 68, 153, 0.3);
         }
         .btn-primary:hover {
             background: #bb5688;
@@ -126,7 +121,6 @@
             cursor: pointer;
             font-size: 1rem;
             transition: background-color 0.3s;
-            box-shadow: 0 2px 5px rgba(136, 136, 204, 0.3);
         }
         .btn-secondary:hover {
             background: #6666AA;
@@ -140,24 +134,9 @@
             cursor: pointer;
             font-size: 1rem;
             transition: background-color 0.3s;
-            box-shadow: 0 2px 5px rgba(204, 170, 136, 0.3);
         }
         .btn-success:hover {
             background: #AA8866;
-        }
-        .btn-danger {
-            background: #ff6b6b;
-            color: white;
-            padding: 0.8rem 2rem;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 1rem;
-            transition: background-color 0.3s;
-            box-shadow: 0 2px 5px rgba(255, 107, 107, 0.3);
-        }
-        .btn-danger:hover {
-            background: #ff5252;
         }
 
         .filters {
@@ -171,12 +150,6 @@
             border: 1px solid #DDAACC;
             border-radius: 5px;
             font-size: 1rem;
-            background: white;
-        }
-        .filters input:focus, .filters select:focus {
-            outline: none;
-            border-color: #884499;
-            box-shadow: 0 0 5px rgba(136, 68, 153, 0.3);
         }
 
         .events-grid {
@@ -189,37 +162,15 @@
             border-radius: 8px;
             padding: 1.5rem;
             box-shadow: 0 2px 10px rgba(136, 68, 153, 0.1);
-            transition: transform 0.3s, box-shadow 0.3s;
-            border-top: 3px solid #8888CC;
-        }
-        .event-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 5px 20px rgba(136, 68, 153, 0.2);
         }
         .event-card h3 {
             color: #884499;
             margin-bottom: 1rem;
-            border-bottom: 2px solid #DDAACC;
-            padding-bottom: 0.5rem;
-        }
-        .event-card p {
-            margin-bottom: 0.5rem;
-            color: #666;
         }
         .event-price {
             font-size: 1.2rem;
             font-weight: bold;
             color: #bb5688;
-        }
-        .event-category {
-            display: inline-block;
-            padding: 0.3rem 0.8rem;
-            border-radius: 20px;
-            font-size: 0.8rem;
-            font-weight: bold;
-            background: #DDAACC;
-            color: #884499;
-            margin-bottom: 1rem;
         }
 
         .auth-form {
@@ -229,7 +180,6 @@
             padding: 2rem;
             border-radius: 8px;
             box-shadow: 0 2px 10px rgba(136, 68, 153, 0.1);
-            border-top: 4px solid #CCAA88;
         }
         .form-group {
             margin-bottom: 1.5rem;
@@ -246,12 +196,6 @@
             border: 1px solid #DDAACC;
             border-radius: 5px;
             font-size: 1rem;
-            background: white;
-        }
-        .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
-            outline: none;
-            border-color: #884499;
-            box-shadow: 0 0 5px rgba(136, 68, 153, 0.3);
         }
         .form-group textarea {
             height: 100px;
@@ -263,81 +207,34 @@
             gap: 1rem;
         }
 
-        .profile-info, .ticket-card {
+        .form-section {
             background: white;
             padding: 1.5rem;
             border-radius: 8px;
-            margin-bottom: 1rem;
+            margin-bottom: 1.5rem;
             box-shadow: 0 2px 5px rgba(136, 68, 153, 0.1);
-            border-left: 4px solid #8888CC;
         }
-
-        .admin-stats {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 1rem;
-            margin-bottom: 2rem;
-        }
-        .admin-actions {
-            display: flex;
-            gap: 1rem;
-            margin-bottom: 2rem;
-            flex-wrap: wrap;
-        }
-        .admin-data {
-            background: white;
-            padding: 1.5rem;
-            border-radius: 8px;
-            box-shadow: 0 2px 5px rgba(136, 68, 153, 0.1);
-            border-top: 3px solid #CCAA88;
-        }
-
-        .category-buttons {
-            display: flex;
-            gap: 1rem;
-            margin-bottom: 2rem;
-            flex-wrap: wrap;
-        }
-        .category-btn {
-            background: #DDAACC;
-            border: 2px solid #bb5688;
-            padding: 0.8rem 1.5rem;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: all 0.3s;
+        .form-section h3 {
             color: #884499;
-            font-weight: bold;
-        }
-        .category-btn.active {
-            background: #884499;
-            color: white;
-            border-color: #bb5688;
-        }
-        .category-btn:hover {
-            background: #bb5688;
-            color: white;
+            margin-bottom: 1rem;
         }
 
         .message {
             padding: 1rem;
             border-radius: 5px;
             margin: 1rem 0;
-            border-left: 4px solid;
         }
         .error {
             background: #ffebee;
             color: #c62828;
-            border-left-color: #bb5688;
         }
         .success {
             background: #e8f5e8;
             color: #2e7d32;
-            border-left-color: #CCAA88;
         }
         .info {
             background: #e3f2fd;
             color: #1565c0;
-            border-left-color: #8888CC;
         }
 
         .loading {
@@ -345,138 +242,6 @@
             padding: 2rem;
             color: #884499;
         }
-
-        .event-status {
-            display: inline-block;
-            padding: 0.3rem 0.8rem;
-            border-radius: 20px;
-            font-size: 0.8rem;
-            font-weight: bold;
-            background: #DDAACC;
-            color: #884499;
-            margin-top: 0.5rem;
-        }
-
-        .form-section {
-            background: white;
-            padding: 1.5rem;
-            border-radius: 8px;
-            margin-bottom: 1.5rem;
-            box-shadow: 0 2px 5px rgba(136, 68, 153, 0.1);
-            border-left: 4px solid #8888CC;
-        }
-
-        .form-section h3 {
-            color: #884499;
-            margin-bottom: 1rem;
-            border-bottom: 2px solid #DDAACC;
-            padding-bottom: 0.5rem;
-        }
-
-        /* Booking Modal Styles */
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.5);
-            z-index: 1000;
-            align-items: center;
-            justify-content: center;
-        }
-        .modal.active {
-            display: flex;
-        }
-        .modal-content {
-            background: white;
-            padding: 2rem;
-            border-radius: 8px;
-            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
-            max-width: 500px;
-            width: 90%;
-            max-height: 90vh;
-            overflow-y: auto;
-        }
-        .modal-header {
-            display: flex;
-            justify-content: between;
-            align-items: center;
-            margin-bottom: 1.5rem;
-            border-bottom: 2px solid #DDAACC;
-            padding-bottom: 1rem;
-        }
-        .modal-header h3 {
-            color: #884499;
-            margin: 0;
-        }
-        .close-modal {
-            background: none;
-            border: none;
-            font-size: 1.5rem;
-            cursor: pointer;
-            color: #884499;
-        }
-        .booking-summary {
-            background: #f8f4ff;
-            padding: 1rem;
-            border-radius: 5px;
-            margin: 1rem 0;
-            border-left: 4px solid #CCAA88;
-        }
-        .quantity-selector {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-            margin: 1rem 0;
-        }
-        .quantity-btn {
-            background: #884499;
-            color: white;
-            border: none;
-            width: 30px;
-            height: 30px;
-            border-radius: 50%;
-            cursor: pointer;
-            font-size: 1rem;
-        }
-        .quantity-display {
-            font-size: 1.2rem;
-            font-weight: bold;
-            min-width: 40px;
-            text-align: center;
-        }
-
-        /* Ticket Styles */
-        .ticket-card {
-            border-left: 4px solid #CCAA88;
-            margin-bottom: 1rem;
-        }
-        .ticket-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 1rem;
-        }
-        .ticket-number {
-            font-weight: bold;
-            color: #884499;
-            background: #f8f4ff;
-            padding: 0.3rem 0.8rem;
-            border-radius: 20px;
-            font-size: 0.9rem;
-        }
-        .ticket-status {
-            padding: 0.3rem 0.8rem;
-            border-radius: 20px;
-            font-size: 0.8rem;
-            font-weight: bold;
-        }
-        .status-pending { background: #fff3cd; color: #856404; }
-        .status-paid { background: #d4edda; color: #155724; }
-        .status-failed { background: #f8d7da; color: #721c24; }
-        .status-refunded { background: #e2e3e5; color: #383d41; }
 
         @media (max-width: 768px) {
             .nav-container {
@@ -493,18 +258,8 @@
             .filters {
                 flex-direction: column;
             }
-            .admin-actions {
-                flex-direction: column;
-            }
             .form-row {
                 grid-template-columns: 1fr;
-            }
-            .category-buttons {
-                justify-content: center;
-            }
-            .modal-content {
-                margin: 1rem;
-                padding: 1rem;
             }
         }
     </style>
@@ -512,7 +267,7 @@
 <body>
 <nav class="navbar">
     <div class="nav-container">
-        <h1 class="logo">C-Event</h1>
+        <h1 class="logo">EventHub</h1>
         <div class="nav-links">
             <a href="#" class="nav-link" onclick="showSection('home')">Home</a>
             <a href="#" class="nav-link" onclick="showSection('events')">Events</a>
@@ -530,8 +285,8 @@
     <!-- Home Section -->
     <section id="home" class="section active">
         <div class="hero">
-            <h2>Welcome to C-Event</h2>
-            <p>Discover amazing events and book your tickets today</p>
+            <h2>Welcome to EventHub</h2>
+            <p>Discover amazing events and book your tickets easily</p>
             <button class="btn-primary" onclick="showSection('events')">Browse Events</button>
         </div>
 
@@ -549,18 +304,11 @@
                 <p>Registered Users</p>
             </div>
         </div>
-
-        <div class="info" style="padding: 1rem; border-radius: 5px; margin: 2rem 0; border-left: 4px solid #CCAA88; background: #f8f4ff;">
-            <h3 style="color: #884499; margin-bottom: 0.5rem;">Demo Admin Account</h3>
-            <p><strong style="color: #bb5688;">Email:</strong> thehollow2008@gmail.com</p>
-            <p><strong style="color: #bb5688;">Password:</strong> NiigoS1tg</p>
-            <p style="margin-top: 0.5rem;">Use this account to create events and access admin features.</p>
-        </div>
     </section>
 
     <!-- Events Section -->
     <section id="events" class="section">
-        <h2 style="color: #884499; margin-bottom: 1rem;">All Events</h2>
+        <h2>All Events</h2>
         <div class="filters">
             <input type="text" id="searchInput" placeholder="Search events..." onkeyup="searchEvents()">
             <select id="categoryFilter" onchange="filterEvents()">
@@ -569,33 +317,26 @@
             <button class="btn-secondary" onclick="loadEvents()">Refresh</button>
             <button class="btn-success" onclick="testEventCreation()" id="testEventBtn" style="display: none;">Test Event Creation</button>
         </div>
-
-        <div class="category-buttons" id="categoryButtons">
-            <!-- Category buttons will be loaded here -->
-        </div>
-
         <div id="eventsList" class="events-grid"></div>
     </section>
 
     <!-- Create Event Section -->
     <section id="create-event" class="section">
         <div class="auth-form">
-            <h2 style="color: #884499; text-align: center; margin-bottom: 2rem;">Create New Event</h2>
-            <form onsubmit="createEvent(event)">
+            <h2>Create New Event</h2>
+            <form id="createEventForm" onsubmit="createEvent(event)">
                 <div class="form-section">
                     <h3>Event Information</h3>
                     <div class="form-group">
-                        <label>Event Title</label>
+                        <label>Event Title *</label>
                         <input type="text" id="eventTitle" required>
                     </div>
-
                     <div class="form-group">
-                        <label>Description</label>
+                        <label>Description *</label>
                         <textarea id="eventDescription" required></textarea>
                     </div>
-
                     <div class="form-group">
-                        <label>Category</label>
+                        <label>Category *</label>
                         <select id="eventCategory" required>
                             <option value="">Select Category</option>
                             <option value="Technology">Technology</option>
@@ -603,10 +344,7 @@
                             <option value="Business">Business</option>
                             <option value="Sports">Sports</option>
                             <option value="Education">Education</option>
-                            <option value="Arts and Culture">Arts and Culture</option>
-                            <option value="Food and Drink">Food and Drink</option>
-                            <option value="Health and Wellness">Health and Wellness</option>
-                            <option value="Other">Other</option>
+                            <option value="Arts">Arts</option>
                         </select>
                     </div>
                 </div>
@@ -615,17 +353,16 @@
                     <h3>Location Details</h3>
                     <div class="form-row">
                         <div class="form-group">
-                            <label>Venue</label>
+                            <label>Venue *</label>
                             <input type="text" id="eventVenue" required>
                         </div>
                         <div class="form-group">
-                            <label>City</label>
+                            <label>City *</label>
                             <input type="text" id="eventCity" required>
                         </div>
                     </div>
-
                     <div class="form-group">
-                        <label>Country</label>
+                        <label>Country *</label>
                         <input type="text" id="eventCountry" required>
                     </div>
                 </div>
@@ -634,11 +371,11 @@
                     <h3>Date & Time</h3>
                     <div class="form-row">
                         <div class="form-group">
-                            <label>Start Date & Time</label>
+                            <label>Start Date & Time *</label>
                             <input type="datetime-local" id="eventStartDate" required>
                         </div>
                         <div class="form-group">
-                            <label>End Date & Time</label>
+                            <label>End Date & Time *</label>
                             <input type="datetime-local" id="eventEndDate" required>
                         </div>
                     </div>
@@ -648,17 +385,16 @@
                     <h3>Organizer Information</h3>
                     <div class="form-row">
                         <div class="form-group">
-                            <label>Organizer Name</label>
+                            <label>Organizer Name *</label>
                             <input type="text" id="organizerName" required>
                         </div>
                         <div class="form-group">
-                            <label>Organizer Email</label>
+                            <label>Organizer Email *</label>
                             <input type="email" id="organizerEmail" required>
                         </div>
                     </div>
-
                     <div class="form-group">
-                        <label>Organizer Phone</label>
+                        <label>Organizer Phone *</label>
                         <input type="tel" id="organizerPhone" required>
                     </div>
                 </div>
@@ -667,17 +403,19 @@
                     <h3>Event Capacity & Pricing</h3>
                     <div class="form-row">
                         <div class="form-group">
-                            <label>Capacity</label>
+                            <label>Capacity *</label>
                             <input type="number" id="eventCapacity" min="1" required>
                         </div>
                         <div class="form-group">
-                            <label>Ticket Price ($)</label>
+                            <label>Ticket Price ($) *</label>
                             <input type="number" id="eventPrice" min="0" step="0.01" required>
                         </div>
                     </div>
                 </div>
 
-                <button type="submit" class="btn-success" style="width: 100%; padding: 1rem; font-size: 1.1rem;">Create Event</button>
+                <button type="submit" class="btn-success" style="width: 100%; padding: 1rem; font-size: 1.1rem;">
+                    Create Event
+                </button>
             </form>
         </div>
     </section>
@@ -685,50 +423,44 @@
     <!-- Login Section -->
     <section id="login" class="section">
         <div class="auth-form">
-            <h2 style="color: #884499; text-align: center; margin-bottom: 2rem;">Login</h2>
+            <h2>Login</h2>
             <form onsubmit="loginUser(event)">
                 <div class="form-group">
-                    <label>Email</label>
+                    <label>Email:</label>
                     <input type="email" id="loginEmail" required>
                 </div>
                 <div class="form-group">
-                    <label>Password</label>
+                    <label>Password:</label>
                     <input type="password" id="loginPassword" required>
                 </div>
-                <button type="submit" class="btn-primary" style="width: 100%; padding: 1rem; font-size: 1.1rem;">Login</button>
+                <button type="submit" class="btn-primary">Login</button>
             </form>
-            <p style="text-align: center; margin-top: 1rem;">Don't have an account? <a href="#" onclick="showSection('register')" style="color: #884499;">Register here</a></p>
-
-            <div class="info" style="margin-top: 2rem; padding: 1rem; border-left: 4px solid #CCAA88; background: #f8f4ff;">
-                <h4 style="color: #884499; margin-bottom: 0.5rem;">Demo Admin Account</h4>
-                <p><strong style="color: #bb5688;">Email:</strong> thehollow2008@gmail.com</p>
-                <p><strong style="color: #bb5688;">Password:</strong> NiigoS1tg</p>
-            </div>
+            <p>Don't have an account? <a href="#" onclick="showSection('register')">Register here</a></p>
         </div>
     </section>
 
     <!-- Register Section -->
     <section id="register" class="section">
         <div class="auth-form">
-            <h2 style="color: #884499; text-align: center; margin-bottom: 2rem;">Register</h2>
+            <h2>Register</h2>
             <form onsubmit="registerUser(event)">
                 <div class="form-group">
-                    <label>Name</label>
+                    <label>Name:</label>
                     <input type="text" id="registerName" required>
                 </div>
                 <div class="form-group">
-                    <label>Email</label>
+                    <label>Email:</label>
                     <input type="email" id="registerEmail" required>
                 </div>
                 <div class="form-group">
-                    <label>Password</label>
+                    <label>Password:</label>
                     <input type="password" id="registerPassword" required minlength="6">
                 </div>
                 <div class="form-group">
-                    <label>Phone</label>
+                    <label>Phone:</label>
                     <input type="tel" id="registerPhone">
                 </div>
-                <button type="submit" class="btn-primary" style="width: 100%; padding: 1rem; font-size: 1.1rem;">Register</button>
+                <button type="submit" class="btn-primary">Register</button>
             </form>
         </div>
     </section>
@@ -736,10 +468,10 @@
     <!-- Profile Section -->
     <section id="profile" class="section">
         <div class="profile-container">
-            <h2 style="color: #884499; margin-bottom: 1rem;">My Profile</h2>
-            <div id="profileInfo"></div>
-            <div id="userTickets">
-                <h3 style="color: #884499; margin-bottom: 1rem;">My Tickets</h3>
+            <h2>My Profile</h2>
+            <div id="profileInfo" class="profile-info"></div>
+            <div id="userTickets" class="tickets-section">
+                <h3>My Tickets</h3>
                 <div id="ticketsList"></div>
             </div>
         </div>
@@ -748,728 +480,20 @@
     <!-- Admin Section -->
     <section id="admin" class="section">
         <div class="admin-container">
-            <h2 style="color: #884499; margin-bottom: 1rem;">Admin Dashboard</h2>
+            <h2>Admin Dashboard</h2>
             <div class="admin-stats" id="adminStats"></div>
             <div class="admin-actions">
                 <button class="btn-primary" onclick="loadAdminStats()">Refresh Stats</button>
+                <button class="btn-secondary" onclick="loadPaymentSummary()">Payment Summary</button>
                 <button class="btn-secondary" onclick="loadTopEvents()">Top Events</button>
                 <button class="btn-success" onclick="showSection('create-event')">Create New Event</button>
                 <button class="btn-secondary" onclick="testEventCreation()">Test Event Creation</button>
             </div>
-            <div id="adminData"></div>
+            <div id="adminData" class="admin-data"></div>
         </div>
     </section>
 </div>
 
-<!-- Booking Modal -->
-<div id="bookingModal" class="modal">
-    <div class="modal-content">
-        <div class="modal-header">
-            <h3>Book Tickets</h3>
-            <button class="close-modal" onclick="closeBookingModal()">&times;</button>
-        </div>
-        <div id="bookingContent">
-            <!-- Booking content will be loaded here -->
-        </div>
-    </div>
-</div>
-
-<script>
-    const API_BASE = window.location.origin + '/api';
-    let currentUser = null;
-    let authToken = null;
-    let categories = [];
-    let currentBookingEvent = null;
-
-    // Initialize
-    document.addEventListener('DOMContentLoaded', function() {
-        checkAuthStatus();
-        loadHomeStats();
-        loadEvents();
-        loadCategories();
-    });
-
-    // Navigation
-    function showSection(sectionId) {
-        document.querySelectorAll('.section').forEach(section => {
-            section.classList.remove('active');
-        });
-        document.getElementById(sectionId).classList.add('active');
-
-        if (sectionId === 'profile' && currentUser) loadProfile();
-        if (sectionId === 'admin' && currentUser?.role === 'admin') loadAdminStats();
-    }
-
-    // Auth Functions
-    async function registerUser(event) {
-        event.preventDefault();
-        const userData = {
-            name: document.getElementById('registerName').value,
-            email: document.getElementById('registerEmail').value,
-            password: document.getElementById('registerPassword').value,
-            phone: document.getElementById('registerPhone').value
-        };
-
-        try {
-            const response = await fetch(`${API_BASE}/auth/register`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(userData)
-            });
-            const data = await response.json();
-            if (data.success) {
-                showMessage('Registration successful! Please login.', 'success');
-                showSection('login');
-                event.target.reset();
-            } else {
-                showMessage(data.message, 'error');
-            }
-        } catch (error) {
-            showMessage('Registration failed. Please try again.', 'error');
-        }
-    }
-
-    async function loginUser(event) {
-        event.preventDefault();
-        const loginData = {
-            email: document.getElementById('loginEmail').value,
-            password: document.getElementById('loginPassword').value
-        };
-
-        try {
-            const response = await fetch(`${API_BASE}/auth/login`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(loginData)
-            });
-            const data = await response.json();
-            if (data.success) {
-                authToken = data.token;
-                currentUser = data.data.user;
-                localStorage.setItem('authToken', authToken);
-                localStorage.setItem('user', JSON.stringify(currentUser));
-                updateNavigation();
-                showMessage('Login successful!', 'success');
-                showSection('home');
-                event.target.reset();
-                loadHomeStats();
-                loadEvents();
-            } else {
-                showMessage(data.message, 'error');
-            }
-        } catch (error) {
-            showMessage('Login failed. Please try again.', 'error');
-        }
-    }
-
-    function logout() {
-        authToken = null;
-        currentUser = null;
-        localStorage.removeItem('authToken');
-        localStorage.removeItem('user');
-        updateNavigation();
-        showSection('home');
-        showMessage('Logged out successfully.', 'success');
-    }
-
-    function checkAuthStatus() {
-        const token = localStorage.getItem('authToken');
-        const user = localStorage.getItem('user');
-        if (token && user) {
-            authToken = token;
-            currentUser = JSON.parse(user);
-            updateNavigation();
-        }
-    }
-
-    function updateNavigation() {
-        const loginLink = document.getElementById('loginLink');
-        const registerLink = document.getElementById('registerLink');
-        const logoutLink = document.getElementById('logoutLink');
-        const adminLink = document.getElementById('adminLink');
-        const createEventLink = document.getElementById('createEventLink');
-        const profileLink = document.getElementById('profileLink');
-        const testEventBtn = document.getElementById('testEventBtn');
-
-        if (currentUser) {
-            loginLink.style.display = 'none';
-            registerLink.style.display = 'none';
-            logoutLink.style.display = 'block';
-            profileLink.style.display = 'block';
-
-            if (currentUser.role === 'admin') {
-                adminLink.style.display = 'block';
-                createEventLink.style.display = 'block';
-                testEventBtn.style.display = 'block';
-            } else {
-                adminLink.style.display = 'none';
-                createEventLink.style.display = 'none';
-                testEventBtn.style.display = 'none';
-            }
-        } else {
-            loginLink.style.display = 'block';
-            registerLink.style.display = 'block';
-            logoutLink.style.display = 'none';
-            adminLink.style.display = 'none';
-            createEventLink.style.display = 'none';
-            profileLink.style.display = 'none';
-            testEventBtn.style.display = 'none';
-        }
-    }
-
-    // Event Creation - FIXED VERSION
-    async function createEvent(event) {
-        event.preventDefault();
-
-        if (!currentUser || currentUser.role !== 'admin') {
-            showMessage('Only administrators can create events', 'error');
-            return;
-        }
-
-        // Format dates properly for backend
-        const startDate = new Date(document.getElementById('eventStartDate').value);
-        const endDate = new Date(document.getElementById('eventEndDate').value);
-
-        const eventData = {
-            title: document.getElementById('eventTitle').value,
-            description: document.getElementById('eventDescription').value,
-            category: document.getElementById('eventCategory').value,
-            venue: document.getElementById('eventVenue').value,
-            city: document.getElementById('eventCity').value,
-            country: document.getElementById('eventCountry').value,
-            startDate: startDate.toISOString(),  // Convert to ISO string
-            endDate: endDate.toISOString(),      // Convert to ISO string
-            organizerName: document.getElementById('organizerName').value,
-            organizerEmail: document.getElementById('organizerEmail').value,
-            organizerPhone: document.getElementById('organizerPhone').value,
-            capacity: parseInt(document.getElementById('eventCapacity').value),
-            ticketPrice: parseFloat(document.getElementById('eventPrice').value)
-        };
-
-        console.log('Sending event data:', eventData); // Debug log
-
-        try {
-            const response = await fetch(`${API_BASE}/events`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${authToken}`
-                },
-                body: JSON.stringify(eventData)
-            });
-
-            const data = await response.json();
-            console.log('Response:', data); // Debug log
-
-            if (data.success) {
-                showMessage('Event created successfully!', 'success');
-                event.target.reset();
-                loadEvents();
-                loadCategories();
-                showSection('events');
-            } else {
-                showMessage(data.message || 'Failed to create event', 'error');
-            }
-        } catch (error) {
-            console.error('Error creating event:', error);
-            showMessage('Failed to create event: ' + error.message, 'error');
-        }
-    }
-
-    // Debug function to test event creation
-    async function testEventCreation() {
-        if (!currentUser || currentUser.role !== 'admin') {
-            showMessage('Please login as admin first', 'error');
-            return;
-        }
-
-        const testData = {
-            title: "Test Event " + new Date().getTime(),
-            description: "This is a test event",
-            category: "Technology",
-            venue: "Test Venue",
-            city: "Test City",
-            country: "Test Country",
-            startDate: new Date(Date.now() + 86400000).toISOString(), // Tomorrow
-            endDate: new Date(Date.now() + 90000000).toISOString(),   // Tomorrow + 1 hour
-            organizerName: currentUser.name,
-            organizerEmail: currentUser.email,
-            organizerPhone: "+1234567890",
-            capacity: 100,
-            ticketPrice: 25.00
-        };
-
-        try {
-            const response = await fetch(`${API_BASE}/events`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${authToken}`
-                },
-                body: JSON.stringify(testData)
-            });
-
-            const data = await response.json();
-            console.log('Test Event Response:', data);
-
-            if (data.success) {
-                showMessage('Test event created successfully!', 'success');
-                loadEvents();
-            } else {
-                showMessage('Test failed: ' + data.message, 'error');
-            }
-        } catch (error) {
-            showMessage('Test failed: ' + error.message, 'error');
-        }
-    }
-
-    // Event Functions - IMPROVED VERSION
-    async function loadEvents() {
-        try {
-            // Try the main events endpoint first, fallback to upcoming
-            let response = await fetch(`${API_BASE}/events?limit=50`);
-            let data = await response.json();
-
-            // If main endpoint fails, try upcoming events
-            if (!data.success) {
-                response = await fetch(`${API_BASE}/events/upcoming`);
-                data = await response.json();
-            }
-
-            if (data.success) {
-                displayEvents(data.data);
-                updateHomeStats(data.data);
-            } else {
-                showMessage('Failed to load events', 'error');
-            }
-        } catch (error) {
-            console.error('Error loading events:', error);
-            showMessage('Failed to load events', 'error');
-        }
-    }
-
-    function displayEvents(events) {
-        const eventsList = document.getElementById('eventsList');
-        if (events.length === 0) {
-            eventsList.innerHTML = `
-                    <div class="loading">
-                        <p>No events found. Create some events to get started!</p>
-                        ${currentUser?.role === 'admin' ?
-                '<button class="btn-success" onclick="showSection(\'create-event\')" style="margin-top: 1rem;">Create Event</button>' :
-                '<p>Contact administrator to add events.</p>'
-            }
-                    </div>
-                `;
-            return;
-        }
-        eventsList.innerHTML = events.map(event => `
-                <div class="event-card">
-                    <span class="event-category">${event.category}</span>
-                    <h3>${event.title}</h3>
-                    <p><strong>Description:</strong> ${event.description}</p>
-                    <p><strong>Date:</strong> ${new Date(event.dateTime.start).toLocaleDateString()}</p>
-                    <p><strong>Time:</strong> ${new Date(event.dateTime.start).toLocaleTimeString()} - ${new Date(event.dateTime.end).toLocaleTimeString()}</p>
-                    <p><strong>Location:</strong> ${event.location.venue}, ${event.location.city}</p>
-                    <p><strong>Price:</strong> $<span class="event-price">${event.ticketPrice}</span></p>
-                    <p><strong>Capacity:</strong> ${event.capacity} people</p>
-                    <p><strong>Organizer:</strong> ${event.organizer.name}</p>
-                    <div style="margin-top: 1rem;">
-                        ${currentUser ?
-            `<button class="btn-secondary" onclick="showBookingModal('${event._id}')">Book Tickets</button>` :
-            '<button class="btn-secondary" onclick="showSection(\'login\')">Login to Book</button>'
-        }
-                    </div>
-                </div>
-            `).join('');
-    }
-
-    // Booking Functions
-    async function showBookingModal(eventId) {
-        if (!currentUser) {
-            showMessage('Please login to book tickets', 'error');
-            showSection('login');
-            return;
-        }
-
-        try {
-            // Get event details
-            const eventResponse = await fetch(`${API_BASE}/events/${eventId}`);
-            const eventData = await eventResponse.json();
-
-            if (!eventData.success) {
-                showMessage('Event not found', 'error');
-                return;
-            }
-
-            const event = eventData.data;
-            currentBookingEvent = event;
-
-            // Check availability
-            const availabilityResponse = await fetch(`${API_BASE}/events/${eventId}/availability`);
-            const availabilityData = await availabilityResponse.json();
-
-            const availability = availabilityData.success ? availabilityData.data : { ticketsAvailable: 0 };
-
-            // Display booking modal
-            document.getElementById('bookingContent').innerHTML = `
-                <div class="booking-summary">
-                    <h4 style="color: #884499; margin-bottom: 0.5rem;">${event.title}</h4>
-                    <p><strong>Date:</strong> ${new Date(event.dateTime.start).toLocaleDateString()}</p>
-                    <p><strong>Location:</strong> ${event.location.venue}, ${event.location.city}</p>
-                    <p><strong>Price per ticket:</strong> $${event.ticketPrice}</p>
-                    <p><strong>Tickets available:</strong> ${availability.ticketsAvailable}</p>
-                </div>
-
-                <div class="form-group">
-                    <label>Number of Tickets</label>
-                    <div class="quantity-selector">
-                        <button class="quantity-btn" onclick="updateQuantity(-1)">-</button>
-                        <span class="quantity-display" id="ticketQuantity">1</span>
-                        <button class="quantity-btn" onclick="updateQuantity(1)">+</button>
-                    </div>
-                </div>
-
-                <div class="booking-summary" id="bookingTotal">
-                    <p><strong>Total Amount:</strong> $${event.ticketPrice}</p>
-                </div>
-
-                <div style="display: flex; gap: 1rem; margin-top: 1.5rem;">
-                    <button type="button" class="btn-secondary" onclick="closeBookingModal()" style="flex: 1;">Cancel</button>
-                    <button type="button" class="btn-success" onclick="confirmBooking()" style="flex: 1;"
-                        ${availability.ticketsAvailable === 0 ? 'disabled' : ''}>
-                        ${availability.ticketsAvailable === 0 ? 'Sold Out' : 'Confirm Booking'}
-                    </button>
-                </div>
-            `;
-
-            document.getElementById('bookingModal').classList.add('active');
-        } catch (error) {
-            console.error('Error loading booking modal:', error);
-            showMessage('Failed to load booking information', 'error');
-        }
-    }
-
-    function closeBookingModal() {
-        document.getElementById('bookingModal').classList.remove('active');
-        currentBookingEvent = null;
-    }
-
-    function updateQuantity(change) {
-        const quantityElement = document.getElementById('ticketQuantity');
-        let quantity = parseInt(quantityElement.textContent);
-        quantity += change;
-
-        if (quantity < 1) quantity = 1;
-        if (quantity > 10) quantity = 10; // Limit to 10 tickets per booking
-
-        quantityElement.textContent = quantity;
-        updateBookingTotal(quantity);
-    }
-
-    function updateBookingTotal(quantity) {
-        if (!currentBookingEvent) return;
-
-        const totalAmount = quantity * currentBookingEvent.ticketPrice;
-        document.getElementById('bookingTotal').innerHTML = `
-            <p><strong>Total Amount:</strong> $${totalAmount.toFixed(2)}</p>
-            <p><small>${quantity} ticket${quantity > 1 ? 's' : ''} x $${currentBookingEvent.ticketPrice}</small></p>
-        `;
-    }
-
-    async function confirmBooking() {
-        if (!currentUser || !currentBookingEvent) return;
-
-        const quantity = parseInt(document.getElementById('ticketQuantity').textContent);
-
-        try {
-            const bookingData = {
-                eventId: currentBookingEvent._id,
-                quantity: quantity
-            };
-
-            const response = await fetch(`${API_BASE}/tickets`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${authToken}`
-                },
-                body: JSON.stringify(bookingData)
-            });
-
-            const data = await response.json();
-
-            if (data.success) {
-                showMessage('Ticket booked successfully!', 'success');
-                closeBookingModal();
-                loadEvents(); // Refresh events to update availability
-                if (document.getElementById('profile').classList.contains('active')) {
-                    loadProfile(); // Refresh profile to show new ticket
-                }
-            } else {
-                showMessage(data.message || 'Failed to book ticket', 'error');
-            }
-        } catch (error) {
-            console.error('Error booking ticket:', error);
-            showMessage('Failed to book ticket: ' + error.message, 'error');
-        }
-    }
-
-    async function loadCategories() {
-        try {
-            const response = await fetch(`${API_BASE}/events/categories`);
-            const data = await response.json();
-            if (data.success) {
-                categories = data.data;
-                displayCategoryButtons();
-                updateCategoryFilter();
-            }
-        } catch (error) {
-            console.error('Failed to load categories');
-        }
-    }
-
-    function displayCategoryButtons() {
-        const categoryButtons = document.getElementById('categoryButtons');
-        if (categories.length === 0) {
-            categoryButtons.innerHTML = '<p>No categories available</p>';
-            return;
-        }
-
-        categoryButtons.innerHTML = `
-                <button class="category-btn active" onclick="filterByCategory('')">All Categories</button>
-                ${categories.map(category => `
-                    <button class="category-btn" onclick="filterByCategory('${category}')">${category}</button>
-                `).join('')}
-            `;
-    }
-
-    function updateCategoryFilter() {
-        const categoryFilter = document.getElementById('categoryFilter');
-        categoryFilter.innerHTML = '<option value="">All Categories</option>' +
-            categories.map(category => `<option value="${category}">${category}</option>`).join('');
-    }
-
-    function filterByCategory(category) {
-        // Update active button
-        document.querySelectorAll('.category-btn').forEach(btn => {
-            btn.classList.remove('active');
-        });
-        event.target.classList.add('active');
-
-        if (!category) {
-            loadEvents();
-            return;
-        }
-
-        // Filter events by category
-        const eventCards = document.querySelectorAll('.event-card');
-        eventCards.forEach(card => {
-            const cardCategory = card.querySelector('.event-category').textContent;
-            card.style.display = cardCategory === category ? 'block' : 'none';
-        });
-    }
-
-    // Profile Functions
-    async function loadProfile() {
-        if (!currentUser) return;
-        try {
-            const response = await fetch(`${API_BASE}/users/${currentUser.id}/profile`, {
-                headers: { 'Authorization': `Bearer ${authToken}` }
-            });
-            const data = await response.json();
-            if (data.success) {
-                displayProfile(data.data);
-                loadUserTickets();
-            }
-        } catch (error) {
-            showMessage('Failed to load profile', 'error');
-        }
-    }
-
-    function displayProfile(profileData) {
-        const profileInfo = document.getElementById('profileInfo');
-        const user = profileData.user;
-        profileInfo.innerHTML = `
-                <div class="profile-info">
-                    <h3 style="color: #884499; margin-bottom: 1rem;">Personal Information</h3>
-                    <p><strong style="color: #bb5688;">Name:</strong> ${user.name}</p>
-                    <p><strong style="color: #bb5688;">Email:</strong> ${user.email}</p>
-                    <p><strong style="color: #bb5688;">Role:</strong> ${user.role}</p>
-                    ${user.phone ? `<p><strong style="color: #bb5688;">Phone:</strong> ${user.phone}</p>` : ''}
-                    <p><strong style="color: #bb5688;">Total Tickets:</strong> ${profileData.ticketStats.totalTickets}</p>
-                </div>
-            `;
-    }
-
-    async function loadUserTickets() {
-        if (!currentUser) return;
-        try {
-            const response = await fetch(`${API_BASE}/users/${currentUser.id}/booking-history?limit=20`, {
-                headers: { 'Authorization': `Bearer ${authToken}` }
-            });
-            const data = await response.json();
-            if (data.success) {
-                displayUserTickets(data.data.bookings);
-            }
-        } catch (error) {
-            console.error('Error loading user tickets:', error);
-        }
-    }
-
-    function displayUserTickets(tickets) {
-        const ticketsList = document.getElementById('ticketsList');
-        if (tickets.length === 0) {
-            ticketsList.innerHTML = `
-                <div class="loading">
-                    <p>No tickets booked yet.</p>
-                    <button class="btn-primary" onclick="showSection('events')" style="margin-top: 1rem;">Browse Events</button>
-                </div>
-            `;
-            return;
-        }
-
-        ticketsList.innerHTML = tickets.map(ticket => `
-            <div class="ticket-card">
-                <div class="ticket-header">
-                    <span class="ticket-number">${ticket.ticketNumber}</span>
-                    <span class="ticket-status status-${ticket.paymentStatus}">${ticket.paymentStatus.toUpperCase()}</span>
-                </div>
-                <p><strong>Event:</strong> ${ticket.event?.title || 'Event details not available'}</p>
-                <p><strong>Quantity:</strong> ${ticket.quantity} ticket${ticket.quantity > 1 ? 's' : ''}</p>
-                <p><strong>Total Amount:</strong> $${ticket.totalAmount}</p>
-                <p><strong>Booked:</strong> ${new Date(ticket.bookedAt).toLocaleDateString()}</p>
-                ${ticket.event ? `
-                    <p><strong>Date:</strong> ${new Date(ticket.event.dateTime.start).toLocaleDateString()}</p>
-                    <p><strong>Location:</strong> ${ticket.event.location.venue}, ${ticket.event.location.city}</p>
-                ` : ''}
-            </div>
-        `).join('');
-    }
-
-    // Admin Functions
-    async function loadAdminStats() {
-        if (!currentUser || currentUser.role !== 'admin') return;
-        try {
-            const response = await fetch(`${API_BASE}/admin/dashboard`, {
-                headers: { 'Authorization': `Bearer ${authToken}` }
-            });
-            const data = await response.json();
-            if (data.success) displayAdminStats(data.data);
-        } catch (error) {
-            showMessage('Failed to load admin stats', 'error');
-        }
-    }
-
-    function displayAdminStats(stats) {
-        const adminStats = document.getElementById('adminStats');
-        const overview = stats.overview;
-        adminStats.innerHTML = `
-                <div class="stat-card">
-                    <h3>${overview.totalUsers}</h3>
-                    <p>Total Users</p>
-                </div>
-                <div class="stat-card">
-                    <h3>${overview.totalEvents}</h3>
-                    <p>Total Events</p>
-                </div>
-                <div class="stat-card">
-                    <h3>${overview.totalTickets}</h3>
-                    <p>Total Tickets</p>
-                </div>
-                <div class="stat-card">
-                    <h3>$${overview.totalRevenue}</h3>
-                    <p>Total Revenue</p>
-                </div>
-            `;
-
-        // Display events by category
-        const adminData = document.getElementById('adminData');
-        adminData.innerHTML = `
-                <h3 style="color: #884499; margin-bottom: 1rem;">Events by Category</h3>
-                ${stats.eventsByCategory.map(cat => `
-                    <div style="margin: 0.5rem 0; padding: 0.5rem; background: #f8f4ff; border-radius: 5px; border-left: 3px solid #8888CC;">
-                        <strong style="color: #884499;">${cat._id}:</strong> ${cat.count} events
-                    </div>
-                `).join('')}
-            `;
-    }
-
-    async function loadTopEvents() {
-        try {
-            const response = await fetch(`${API_BASE}/events/top/registered?limit=5`);
-            const data = await response.json();
-            if (data.success) {
-                const adminData = document.getElementById('adminData');
-                adminData.innerHTML = `
-                        <h3 style="color: #884499; margin-bottom: 1rem;">Top 5 Most Registered Events</h3>
-                        ${data.data.length > 0 ? data.data.map((event, index) => `
-                            <div style="margin: 1rem 0; padding: 1rem; background: #f8f4ff; border-radius: 5px; border-left: 3px solid #CCAA88;">
-                                <h4 style="color: #884499; margin-bottom: 0.5rem;">#${index + 1} - ${event.eventName}</h4>
-                                <p><strong style="color: #bb5688;">Registrations:</strong> ${event.totalRegistrations}</p>
-                            </div>
-                        `).join('') : '<p>No registration data available yet.</p>'}
-                    `;
-            }
-        } catch (error) {
-            showMessage('Failed to load top events', 'error');
-        }
-    }
-
-    // Utility Functions
-    function updateHomeStats(events) {
-        document.getElementById('totalEvents').textContent = events.length;
-        document.getElementById('upcomingEvents').textContent = events.length;
-
-        // Count unique categories for stats
-        const uniqueCategories = new Set(events.map(event => event.category));
-        document.getElementById('totalUsers').textContent = uniqueCategories.size + '+ Categories';
-    }
-
-    async function loadHomeStats() {
-        try {
-            const eventsResponse = await fetch(`${API_BASE}/events/upcoming`);
-            const eventsData = await eventsResponse.json();
-            if (eventsData.success) {
-                document.getElementById('totalEvents').textContent = eventsData.count;
-                document.getElementById('upcomingEvents').textContent = eventsData.count;
-            }
-            document.getElementById('totalUsers').textContent = 'Loading...';
-        } catch (error) {
-            console.error('Failed to load stats');
-        }
-    }
-
-    function showMessage(message, type) {
-        const existingMessages = document.querySelectorAll('.message');
-        existingMessages.forEach(msg => msg.remove());
-        const messageDiv = document.createElement('div');
-        messageDiv.className = `message ${type}`;
-        messageDiv.textContent = message;
-        const container = document.querySelector('.container');
-        container.insertBefore(messageDiv, container.firstChild);
-        setTimeout(() => messageDiv.remove(), 5000);
-    }
-
-    function searchEvents() {
-        const searchTerm = document.getElementById('searchInput').value.toLowerCase();
-        const eventCards = document.querySelectorAll('.event-card');
-        eventCards.forEach(card => {
-            const title = card.querySelector('h3').textContent.toLowerCase();
-            card.style.display = title.includes(searchTerm) ? 'block' : 'none';
-        });
-    }
-
-    function filterEvents() {
-        const category = document.getElementById('categoryFilter').value;
-        filterByCategory(category);
-    }
-
-    // Close modal when clicking outside
-    document.getElementById('bookingModal').addEventListener('click', function(e) {
-        if (e.target === this) {
-            closeBookingModal();
-        }
-    });
-</script>
+<script src="script.js"></script>
 </body>
 </html>
