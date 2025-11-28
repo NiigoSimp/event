@@ -31,13 +31,27 @@ const ticketSchema = new mongoose.Schema({
         enum: ['pending', 'paid', 'failed', 'refunded'],
         default: 'pending'
     },
-    paymentMethod: String,
+    paymentMethod: {
+        type: String,
+        enum: ['credit_card', 'debit_card', 'paypal', 'bank_transfer', 'cash'],
+        default: 'credit_card'
+    },
+    paymentDetails: {
+        transactionId: String,
+        paymentDate: Date,
+        cardLastFour: String
+    },
     bookedAt: {
         type: Date,
         default: Date.now
-    }
+    },
+    qrCode: String
+}, {
+    timestamps: true
 });
 
-ticketSchema.index({ event: 1, user: 1 });
+// Index for better query performance
+ticketSchema.index({ user: 1, bookedAt: -1 });
+ticketSchema.index({ event: 1, paymentStatus: 1 });
 
 module.exports = mongoose.model('Ticket', ticketSchema);

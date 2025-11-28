@@ -359,6 +359,46 @@
             padding-bottom: 0.5rem;
         }
 
+        /* Ticket Status Styles */
+        .event-category.paid {
+            background: #d4edda;
+            color: #155724;
+        }
+        .event-category.pending {
+            background: #fff3cd;
+            color: #856404;
+        }
+        .event-category.refunded {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        .event-category.failed {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        /* Modal Styles */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+        .modal-content {
+            background: white;
+            padding: 2rem;
+            border-radius: 8px;
+            max-width: 500px;
+            width: 90%;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+
         @media (max-width: 768px) {
             .nav-container {
                 flex-direction: column;
@@ -393,6 +433,7 @@
         <div class="nav-links">
             <a href="#" class="nav-link" onclick="showSection('home')">Home</a>
             <a href="#" class="nav-link" onclick="showSection('events')">Events</a>
+            <a href="#" class="nav-link" onclick="showSection('myTickets')" id="myTicketsLink" style="display: none;">My Tickets</a>
             <a href="#" class="nav-link" onclick="showSection('login')" id="loginLink">Login</a>
             <a href="#" class="nav-link" onclick="showSection('register')" id="registerLink">Register</a>
             <a href="#" class="nav-link" onclick="logout()" id="logoutLink" style="display: none;">Logout</a>
@@ -452,6 +493,23 @@
         </div>
 
         <div id="eventsList" class="events-grid"></div>
+    </section>
+
+    <!-- My Tickets Section -->
+    <section id="myTickets" class="section">
+        <div class="profile-container">
+            <h2 style="color: #884499; margin-bottom: 1rem;">My Tickets</h2>
+            <div class="filters">
+                <select id="ticketStatusFilter" onchange="loadMyTickets()">
+                    <option value="">All Tickets</option>
+                    <option value="paid">Paid</option>
+                    <option value="pending">Pending</option>
+                    <option value="refunded">Refunded</option>
+                </select>
+                <button class="btn-secondary" onclick="loadMyTickets()">Refresh</button>
+            </div>
+            <div id="ticketsList" class="events-grid"></div>
+        </div>
     </section>
 
     <!-- Create Event Section -->
@@ -617,7 +675,7 @@
             <div id="profileInfo"></div>
             <div id="userTickets">
                 <h3 style="color: #884499; margin-bottom: 1rem;">My Tickets</h3>
-                <div id="ticketsList"></div>
+                <div id="ticketsListProfile"></div>
             </div>
         </div>
     </section>
@@ -661,6 +719,7 @@
 
         if (sectionId === 'profile' && currentUser) loadProfile();
         if (sectionId === 'admin' && currentUser?.role === 'admin') loadAdminStats();
+        if (sectionId === 'myTickets' && currentUser) loadMyTickets();
     }
 
     // Auth Functions
@@ -752,6 +811,7 @@
         const adminLink = document.getElementById('adminLink');
         const createEventLink = document.getElementById('createEventLink');
         const profileLink = document.getElementById('profileLink');
+        const myTicketsLink = document.getElementById('myTicketsLink');
         const testEventBtn = document.getElementById('testEventBtn');
 
         if (currentUser) {
@@ -759,6 +819,7 @@
             registerLink.style.display = 'none';
             logoutLink.style.display = 'block';
             profileLink.style.display = 'block';
+            myTicketsLink.style.display = 'block';
 
             if (currentUser.role === 'admin') {
                 adminLink.style.display = 'block';
@@ -776,6 +837,7 @@
             adminLink.style.display = 'none';
             createEventLink.style.display = 'none';
             profileLink.style.display = 'none';
+            myTicketsLink.style.display = 'none';
             testEventBtn.style.display = 'none';
         }
     }
@@ -998,6 +1060,215 @@
         });
     }
 
+    // Ticket Functions
+    async function bookTicket(eventId) {
+        if (!currentUser) {
+            showMessage('Please login to book tickets', 'error');
+            showSection('login');
+            return;
+        }
+
+        const quantity = prompt('How many tickets would you like to purchase?', '1');
+        if (!quantity || isNaN(quantity) || quantity < 1) {
+            showMessage('Please enter a valid quantity', 'error');
+            return;
+        }
+
+        try {
+            const response = await fetch(`${API_BASE}/tickets/purchase`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${authToken}`
+                },
+                body: JSON.stringify({
+                    eventId: eventId,
+                    quantity: parseInt(quantity),
+                    paymentMethod: 'credit_card',
+                    paymentDetails: {
+                        cardLastFour: '1234'
+                    }
+                })
+            });
+
+            const data = await response.json();
+
+            if (data.success) {
+                showTicketConfirmation(data.data.ticket);
+                loadMyTickets();
+            } else {
+                showMessage('Ticket purchase failed: ' + data.message, 'error');
+            }
+        } catch (error) {
+            console.error('Ticket purchase error:', error);
+            showMessage('Failed to purchase ticket', 'error');
+        }
+    }
+
+    async function loadMyTickets() {
+        if (!currentUser) return;
+
+        const statusFilter = document.getElementById('ticketStatusFilter')?.value || '';
+        let url = `${API_BASE}/tickets/my-tickets`;
+        if (statusFilter) {
+            url += `?status=${statusFilter}`;
+        }
+
+        try {
+            const response = await fetch(url, {
+                headers: {
+                    'Authorization': `Bearer ${authToken}`
+                }
+            });
+            const data = await response.json();
+
+            if (data.success) {
+                displayMyTickets(data.data.tickets);
+            } else {
+                showMessage('Failed to load tickets', 'error');
+            }
+        } catch (error) {
+            console.error('Error loading tickets:', error);
+            showMessage('Failed to load tickets', 'error');
+        }
+    }
+
+    function displayMyTickets(tickets) {
+        const ticketsList = document.getElementById('ticketsList');
+        const ticketsListProfile = document.getElementById('ticketsListProfile');
+
+        if (tickets.length === 0) {
+            const emptyMessage = `
+                <div class="loading">
+                    <p>No tickets found. Book some events to get started!</p>
+                    <button class="btn-success" onclick="showSection('events')" style="margin-top: 1rem;">Browse Events</button>
+                </div>
+            `;
+            if (ticketsList) ticketsList.innerHTML = emptyMessage;
+            if (ticketsListProfile) ticketsListProfile.innerHTML = emptyMessage;
+            return;
+        }
+
+        const ticketHTML = tickets.map(ticket => `
+            <div class="event-card">
+                <span class="event-category ${ticket.paymentStatus}">${ticket.paymentStatus.toUpperCase()}</span>
+                <h3>${ticket.event.title}</h3>
+                <p><strong>Ticket Number:</strong> ${ticket.ticketNumber}</p>
+                <p><strong>Quantity:</strong> ${ticket.quantity}</p>
+                <p><strong>Total Paid:</strong> $${ticket.totalAmount}</p>
+                <p><strong>Event Date:</strong> ${new Date(ticket.event.dateTime.start).toLocaleDateString()}</p>
+                <p><strong>Venue:</strong> ${ticket.event.location.venue}, ${ticket.event.location.city}</p>
+                <div style="margin-top: 1rem;">
+                    <button class="btn-secondary" onclick="viewTicket('${ticket._id}')">View Details</button>
+                    ${ticket.paymentStatus === 'paid' ?
+            `<button class="btn-success" onclick="cancelTicket('${ticket._id}')">Cancel Ticket</button>` :
+            ''
+        }
+                </div>
+            </div>
+        `).join('');
+
+        if (ticketsList) ticketsList.innerHTML = ticketHTML;
+        if (ticketsListProfile) ticketsListProfile.innerHTML = ticketHTML;
+    }
+
+    function showTicketConfirmation(ticket) {
+        const modal = document.createElement('div');
+        modal.className = 'modal';
+
+        modal.innerHTML = `
+            <div class="modal-content">
+                <h2 style="color: #884499; text-align: center; margin-bottom: 1rem;">🎉 Ticket Purchased Successfully!</h2>
+                <div style="text-align: center; margin-bottom: 1.5rem;">
+                    <p><strong>Event:</strong> ${ticket.event.title}</p>
+                    <p><strong>Ticket Number:</strong> ${ticket.ticketNumber}</p>
+                    <p><strong>Quantity:</strong> ${ticket.quantity}</p>
+                    <p><strong>Total:</strong> $${ticket.totalAmount}</p>
+                    <p><strong>Date:</strong> ${new Date(ticket.event.date).toLocaleDateString()}</p>
+                    <img src="${ticket.qrCode}" alt="QR Code" style="max-width: 200px; margin: 1rem auto; display: block;">
+                </div>
+                <button onclick="this.parentElement.parentElement.remove()"
+                        class="btn-primary"
+                        style="width: 100%; padding: 1rem;">
+                    Close
+                </button>
+            </div>
+        `;
+
+        document.body.appendChild(modal);
+    }
+
+    async function cancelTicket(ticketId) {
+        if (!confirm('Are you sure you want to cancel this ticket? Refunds may take 5-7 business days.')) {
+            return;
+        }
+
+        try {
+            const response = await fetch(`${API_BASE}/tickets/${ticketId}/cancel`, {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${authToken}`
+                }
+            });
+
+            const data = await response.json();
+
+            if (data.success) {
+                showMessage('Ticket cancelled successfully! ' + data.message, 'success');
+                loadMyTickets();
+            } else {
+                showMessage('Cancellation failed: ' + data.message, 'error');
+            }
+        } catch (error) {
+            console.error('Ticket cancellation error:', error);
+            showMessage('Failed to cancel ticket', 'error');
+        }
+    }
+
+    async function viewTicket(ticketId) {
+        try {
+            const response = await fetch(`${API_BASE}/tickets/${ticketId}`, {
+                headers: {
+                    'Authorization': `Bearer ${authToken}`
+                }
+            });
+            const data = await response.json();
+
+            if (data.success) {
+                const ticket = data.data;
+                const modal = document.createElement('div');
+                modal.className = 'modal';
+
+                modal.innerHTML = `
+                    <div class="modal-content">
+                        <h2 style="color: #884499; margin-bottom: 1rem;">Ticket Details</h2>
+                        <div style="margin-bottom: 1.5rem;">
+                            <p><strong>Event:</strong> ${ticket.event.title}</p>
+                            <p><strong>Ticket Number:</strong> ${ticket.ticketNumber}</p>
+                            <p><strong>Quantity:</strong> ${ticket.quantity}</p>
+                            <p><strong>Total Amount:</strong> $${ticket.totalAmount}</p>
+                            <p><strong>Status:</strong> ${ticket.paymentStatus}</p>
+                            <p><strong>Booked On:</strong> ${new Date(ticket.bookedAt).toLocaleDateString()}</p>
+                            <p><strong>Event Date:</strong> ${new Date(ticket.event.dateTime.start).toLocaleDateString()}</p>
+                            <p><strong>Venue:</strong> ${ticket.event.location.venue}, ${ticket.event.location.city}</p>
+                            <p><strong>Organizer:</strong> ${ticket.event.organizer.name}</p>
+                            ${ticket.qrCode ? `<img src="${ticket.qrCode}" alt="QR Code" style="max-width: 200px; margin: 1rem auto; display: block;">` : ''}
+                        </div>
+                        <button onclick="this.parentElement.parentElement.remove()"
+                                class="btn-primary"
+                                style="width: 100%; padding: 1rem;">
+                            Close
+                        </button>
+                    </div>
+                `;
+
+                document.body.appendChild(modal);
+            }
+        } catch (error) {
+            showMessage('Failed to load ticket details', 'error');
+        }
+    }
+
     // Profile Functions
     async function loadProfile() {
         if (!currentUser) return;
@@ -1007,6 +1278,7 @@
             });
             const data = await response.json();
             if (data.success) displayProfile(data.data);
+            loadMyTickets();
         } catch (error) {
             showMessage('Failed to load profile', 'error');
         }
@@ -1143,10 +1415,6 @@
     function filterEvents() {
         const category = document.getElementById('categoryFilter').value;
         filterByCategory(category);
-    }
-
-    function bookTicket(eventId) {
-        showMessage('Ticket booking feature coming soon!', 'success');
     }
 </script>
 </body>

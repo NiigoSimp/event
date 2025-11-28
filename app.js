@@ -2,34 +2,40 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
+const path = require('path');
 require('dotenv').config();
 
-const connectDB = require('./config/database');
-
-// Route imports
-const authRoutes = require('./routes/auth');
-const eventRoutes = require('./routes/events');
-const userRoutes = require('./routes/users');
-const adminRoutes = require('./routes/admin');
-
 const app = express();
-
-// Connect to database
-connectDB();
 
 // Middleware
 app.use(cors());
 app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+app.use(express.static(path.join(__dirname, 'public')));
+
+// MongoDB Connection
+const MONGODB_URI = process.env.MONGODB_URI || 'mongodb+srv://Zmz:ILoveZmz@cluster0.qzzflwg.mongodb.net/event-management-DB?retryWrites=true&w=majority';
+
+mongoose.connect(MONGODB_URI, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+})
+    .then(() => {
+        console.log('MongoDB Connected Successfully');
+    })
+    .catch(err => {
+        console.error('MongoDB connection error:', err);
+        process.exit(1);
+    });
 
 // Routes
-app.use('/api/auth', authRoutes);
-app.use('/api/events', eventRoutes);
-app.use('/api/users', userRoutes);
-app.use('/api/admin', adminRoutes);
+app.use('/api/auth', require('./routes/auth'));
+app.use('/api/events', require('./routes/events'));
+app.use('/api/users', require('./routes/users'));
+app.use('/api/admin', require('./routes/admin'));
+app.use('/api/tickets', require('./routes/tickets')); // ADD THIS LINE
 
-// Home route
-app.get('/', (req, res) => {
+// API Home
+app.get('/api', (req, res) => {
     res.json({
         message: 'Event Management API',
         version: '1.0.0',
@@ -37,34 +43,15 @@ app.get('/', (req, res) => {
             auth: '/api/auth',
             events: '/api/events',
             users: '/api/users',
-            admin: '/api/admin'
+            admin: '/api/admin',
+            tickets: '/api/tickets' // ADD THIS LINE
         }
     });
 });
 
-// Error handling middleware
-app.use((err, req, res, next) => {
-    console.error(err.stack);
-    res.status(500).json({
-        success: false,
-        message: 'Something went wrong!',
-        error: process.env.NODE_ENV === 'production' ? {} : err.stack
-    });
+// Serve frontend
+app.get('*', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
-
-// 404 handler
-app.use('*', (req, res) => {
-    res.status(404).json({
-        success: false,
-        message: 'Route not found'
-    });
-});
-
-const PORT = process.env.PORT || 5000;
-
-app.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`);
-    console.log(`Environment: ${process.env.NODE_ENV || 'development'}`);
-});
-
+app.use('/api/tickets', require('./routes/tickets'));
 module.exports = app;

@@ -297,6 +297,202 @@ function displayEvents(events) {
     `).join('');
 }
 
+// Ticket Buying Functions
+async function purchaseTicket(eventId, quantity) {
+    try {
+        const token = localStorage.getItem('token');
+        if (!token) {
+            alert('Please login to purchase tickets');
+            showLoginModal();
+            return;
+        }
+
+        const response = await fetch('/api/tickets/purchase', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify({
+                eventId: eventId,
+                quantity: quantity,
+                paymentMethod: 'credit_card',
+                paymentDetails: {
+                    cardLastFour: '1234' // In real app, get from payment form
+                }
+            })
+        });
+
+        const result = await response.json();
+
+        if (result.success) {
+            showTicketConfirmation(result.data.ticket);
+        } else {
+            alert('Ticket purchase failed: ' + result.message);
+        }
+    } catch (error) {
+        console.error('Ticket purchase error:', error);
+        alert('Error purchasing ticket');
+    }
+}
+
+async function getMyTickets() {
+    try {
+        const token = localStorage.getItem('token');
+        if (!token) {
+            alert('Please login to view your tickets');
+            return;
+        }
+
+        const response = await fetch('/api/tickets/my-tickets', {
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        });
+
+        const result = await response.json();
+
+        if (result.success) {
+            displayMyTickets(result.data.tickets);
+        } else {
+            alert('Failed to load tickets');
+        }
+    } catch (error) {
+        console.error('Error loading tickets:', error);
+    }
+}
+
+function displayMyTickets(tickets) {
+    const ticketsContainer = document.getElementById('ticketsContainer');
+    if (!ticketsContainer) return;
+
+    if (tickets.length === 0) {
+        ticketsContainer.innerHTML = '<p>No tickets purchased yet.</p>';
+        return;
+    }
+
+    ticketsContainer.innerHTML = tickets.map(ticket => `
+        <div class="ticket-card">
+            <div class="ticket-header">
+                <h3>${ticket.event.title}</h3>
+                <span class="ticket-status ${ticket.paymentStatus}">${ticket.paymentStatus}</span>
+            </div>
+            <div class="ticket-info">
+                <p><strong>Ticket Number:</strong> ${ticket.ticketNumber}</p>
+                <p><strong>Quantity:</strong> ${ticket.quantity}</p>
+                <p><strong>Total Paid:</strong> $${ticket.totalAmount}</p>
+                <p><strong>Event Date:</strong> ${new Date(ticket.event.dateTime.start).toLocaleDateString()}</p>
+                <p><strong>Venue:</strong> ${ticket.event.location.venue}, ${ticket.event.location.city}</p>
+            </div>
+            <div class="ticket-actions">
+                <button onclick="viewTicket('${ticket._id}')" class="btn-view">View Ticket</button>
+                ${ticket.paymentStatus === 'paid' ?
+        `<button onclick="cancelTicket('${ticket._id}')" class="btn-cancel">Cancel</button>` :
+        ''
+    }
+            </div>
+        </div>
+    `).join('');
+}
+
+function showTicketConfirmation(ticket) {
+    const modal = document.createElement('div');
+    modal.className = 'modal';
+    modal.innerHTML = `
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>🎉 Ticket Purchased Successfully!</h2>
+            <div class="ticket-confirmation">
+                <p><strong>Event:</strong> ${ticket.event.title}</p>
+                <p><strong>Ticket Number:</strong> ${ticket.ticketNumber}</p>
+                <p><strong>Quantity:</strong> ${ticket.quantity}</p>
+                <p><strong>Total:</strong> $${ticket.totalAmount}</p>
+                <p><strong>Date:</strong> ${new Date(ticket.event.date).toLocaleDateString()}</p>
+                <img src="${ticket.qrCode}" alt="QR Code" class="qr-code">
+            </div>
+            <button onclick="closeModal()" class="btn-primary">Close</button>
+        </div>
+    `;
+    document.body.appendChild(modal);
+
+    modal.querySelector('.close').onclick = () => modal.remove();
+}
+
+// Add to existing event display to include buy button
+function displayEventsWithBuyButton(events) {
+    const eventsContainer = document.getElementById('eventsContainer');
+    eventsContainer.innerHTML = events.map(event => `
+        <div class="event-card">
+            <h3>${event.title}</h3>
+            <p>${event.description}</p>
+            <p><strong>Date:</strong> ${new Date(event.dateTime.start).toLocaleDateString()}</p>
+            <p><strong>Venue:</strong> ${event.location.venue}, ${event.location.city}</p>
+            <p><strong>Price:</strong> $${event.ticketPrice}</p>
+            <p><strong>Tickets Available:</strong> 
+                <span class="availability" id="availability-${event._id}">Checking...</span>
+            </p>
+            <div class="event-actions">
+                <button onclick="checkAvailability('${event._id}')" class="btn-secondary">Check Availability</button>
+                <button onclick="showBuyTicketModal('${event._id}')" class="btn-primary">Buy Tickets</button>
+            </div>
+        </div>
+    `).join('');
+
+    // Check availability for all events
+    events.forEach(event => checkAvailability(event._id));
+}
+
+async function checkAvailability(eventId) {
+    try {
+        const response = await fetch(`/api/events/${eventId}/availability`);
+        const result = await response.json();
+
+        if (result.success) {
+            const availabilityElement = document.getElementById(`availability-${eventId}`);
+            availabilityElement.textContent = result.data.ticketsAvailable;
+            availabilityElement.className = `availability ${result.data.isAvailable ? 'available' : 'sold-out'}`;
+        }
+    } catch (error) {
+        console.error('Error checking availability:', error);
+    }
+}
+
+function showBuyTicketModal(eventId) {
+    const modal = document.createElement('div');
+    modal.className = 'modal';
+    modal.innerHTML = `
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>Buy Tickets</h2>
+            <form id="buyTicketForm">
+                <input type="hidden" id="eventId" value="${eventId}">
+                <div class="form-group">
+                    <label for="quantity">Number of Tickets:</label>
+                    <input type="number" id="quantity" min="1" max="10" value="1" required>
+                </div>
+                <div class="form-group">
+                    <label for="paymentMethod">Payment Method:</label>
+                    <select id="paymentMethod" required>
+                        <option value="credit_card">Credit Card</option>
+                        <option value="debit_card">Debit Card</option>
+                        <option value="paypal">PayPal</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn-primary">Purchase Tickets</button>
+            </form>
+        </div>
+    `;
+    document.body.appendChild(modal);
+
+    modal.querySelector('.close').onclick = () => modal.remove();
+    modal.querySelector('#buyTicketForm').onsubmit = (e) => {
+        e.preventDefault();
+        const quantity = parseInt(document.getElementById('quantity').value);
+        purchaseTicket(eventId, quantity);
+        modal.remove();
+    };
+}
+
 async function loadCategories() {
     try {
         const response = await fetch(`${API_BASE}/events/categories`);

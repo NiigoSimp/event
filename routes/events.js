@@ -1,20 +1,222 @@
 // routes/events.js
 const express = require('express');
+const mongoose = require('mongoose');
+const router = express.Router();
 const Event = require('../models/Event');
-const Ticket = require('../models/Ticket');
-const Category = require('../models/Category');
 const { protect, authorize } = require('../middleware/auth');
 
-const router = express.Router();
+// GET /api/events - Get all events with filtering and pagination
+router.get('/', async (req, res) => {
+    try {
+        const { page = 1, limit = 10, category, status, search } = req.query;
 
-// 1. Lấy danh sách sự kiện sắp diễn ra
-router.get('/upcoming', async (req, res) => {
+        let query = {};
+
+        if (category) {
+            query.category = category;
+        }
+
+        if (status) {
+            query.status = status;
+        }
+
+        if (search) {
+            query.$or = [
+                { title: { $regex: search, $options: 'i' } },
+                { description: { $regex: search, $options: 'i' } },
+                { 'location.venue': { $regex: search, $options: 'i' } },
+                { 'location.city': { $regex: search, $options: 'i' } }
+            ];
+        }
+
+        const events = await Event.find(query)
+            .skip((page - 1) * limit)
+            .limit(parseInt(limit))
+            .sort('dateTime.start');
+
+        const totalEvents = await Event.countDocuments(query);
+
+        res.json({
+            success: true,
+            count: events.length,
+            total: totalEvents,
+            data: events,
+            pagination: {
+                page: parseInt(page),
+                limit: parseInt(limit),
+                pages: Math.ceil(totalEvents / limit)
+            }
+        });
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: error.message
+        });
+    }
+});
+
+// POST /api/events - Create new event (Admin only)
+router.post('/', protect, authorize('admin'), async (req, res) => {
+    try {
+        console.log('=== EVENT CREATION STARTED ===');
+        console.log('Request body:', req.body);
+
+        const {
+            title,
+            description,
+            category,
+            venue,
+            city,
+            country,
+            startDate,
+            endDate,
+            organizerName,
+            organizerEmail,
+            organizerPhone,
+            capacity,
+            ticketPrice
+        } = req.body;
+
+        // Validation
+        if (!title || !description || !category || !venue || !city || !country ||
+            !startDate || !endDate || !organizerName || !organizerEmail || !organizerPhone ||
+            !capacity || !ticketPrice) {
+            return res.status(400).json({
+                success: false,
+                message: 'All fields are required'
+            });
+        }
+
+        // Create event with proper nested structure
+        const eventData = {
+            title,
+            description,
+            category,
+            location: {
+                venue,
+                city,
+                country
+            },
+            dateTime: {
+                start: new Date(startDate),
+                end: new Date(endDate)
+            },
+            organizer: {
+                name: organizerName,
+                email: organizerEmail,
+                phone: organizerPhone
+            },
+            capacity: parseInt(capacity),
+            ticketPrice: parseFloat(ticketPrice)
+        };
+
+        console.log('Processed event data:', eventData);
+
+        const event = await Event.create(eventData);
+
+        console.log('Event saved successfully:', event._id);
+        console.log('=== EVENT CREATION COMPLETED ===');
+
+        res.status(201).json({
+            success: true,
+            message: 'Event created successfully',
+            data: event
+        });
+    } catch (error) {
+        console.error('Error saving event:', error);
+        res.status(400).json({
+            success: false,
+            message: error.message,
+            details: error.errors
+        });
+    }
+});
+
+// GET /api/events/:id - Get single event by ID
+router.get('/:id', async (req, res) => {
+    try {
+        const event = await Event.findById(req.params.id);
+
+        if (!event) {
+            return res.status(404).json({
+                success: false,
+                message: 'Event not found'
+            });
+        }
+
+        res.json({
+            success: true,
+            data: event
+        });
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: error.message
+        });
+    }
+});
+
+// PUT /api/events/:id - Update event (Admin only)
+router.put('/:id', protect, authorize('admin'), async (req, res) => {
+    try {
+        const event = await Event.findByIdAndUpdate(req.params.id, req.body, {
+            new: true,
+            runValidators: true
+        });
+
+        if (!event) {
+            return res.status(404).json({
+                success: false,
+                message: 'Event not found'
+            });
+        }
+
+        res.json({
+            success: true,
+            message: 'Event updated successfully',
+            data: event
+        });
+    } catch (error) {
+        res.status(400).json({
+            success: false,
+            message: error.message
+        });
+    }
+});
+
+// DELETE /api/events/:id - Delete event (Admin only)
+router.delete('/:id', protect, authorize('admin'), async (req, res) => {
+    try {
+        const event = await Event.findByIdAndDelete(req.params.id);
+
+        if (!event) {
+            return res.status(404).json({
+                success: false,
+                message: 'Event not found'
+            });
+        }
+
+        res.json({
+            success: true,
+            message: 'Event deleted successfully'
+        });
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: error.message
+        });
+    }
+});
+
+// ==================== ADDITIONAL EVENT ROUTES ====================
+
+// GET /api/events/upcoming - Get upcoming events
+router.get('/upcoming/upcoming', async (req, res) => {
     try {
         const events = await Event.find({
             'dateTime.start': { $gte: new Date() },
             status: 'upcoming'
         })
-            .populate('category', 'name')
             .sort('dateTime.start')
             .limit(50);
 
@@ -31,28 +233,26 @@ router.get('/upcoming', async (req, res) => {
     }
 });
 
-// 2. Tìm sự kiện theo thể loại và địa điểm
-router.get('/search', async (req, res) => {
+// GET /api/events/search - Search events by category and location
+router.get('/search/search', async (req, res) => {
     try {
         const { category, location, page = 1, limit = 10 } = req.query;
 
         let query = {};
 
         if (category) {
-            const categoryDoc = await Category.findOne({
-                name: { $regex: category, $options: 'i' }
-            });
-            if (categoryDoc) {
-                query.category = categoryDoc._id;
-            }
+            query.category = { $regex: category, $options: 'i' };
         }
 
         if (location) {
-            query['location.venue'] = { $regex: location, $options: 'i' };
+            query.$or = [
+                { 'location.venue': { $regex: location, $options: 'i' } },
+                { 'location.city': { $regex: location, $options: 'i' } },
+                { 'location.country': { $regex: location, $options: 'i' } }
+            ];
         }
 
         const events = await Event.find(query)
-            .populate('category', 'name')
             .skip((page - 1) * limit)
             .limit(parseInt(limit))
             .sort('dateTime.start');
@@ -70,8 +270,8 @@ router.get('/search', async (req, res) => {
     }
 });
 
-// 3. Đếm số lượng sự kiện theo trạng thái
-router.get('/count-by-status', protect, authorize('admin'), async (req, res) => {
+// GET /api/events/count-by-status - Count events by status (Admin only)
+router.get('/count-by-status/count-by-status', protect, authorize('admin'), async (req, res) => {
     try {
         const statusCount = await Event.aggregate([
             {
@@ -94,40 +294,7 @@ router.get('/count-by-status', protect, authorize('admin'), async (req, res) => 
     }
 });
 
-// 6. Đếm số vé đã bán cho một sự kiện
-router.get('/:eventId/tickets-sold', async (req, res) => {
-    try {
-        const { eventId } = req.params;
-
-        const ticketsSold = await Ticket.aggregate([
-            {
-                $match: {
-                    event: mongoose.Types.ObjectId(eventId),
-                    paymentStatus: 'paid'
-                }
-            },
-            {
-                $group: {
-                    _id: '$event',
-                    totalTicketsSold: { $sum: '$quantity' },
-                    totalRevenue: { $sum: '$totalAmount' }
-                }
-            }
-        ]);
-
-        res.json({
-            success: true,
-            data: ticketsSold[0] || { totalTicketsSold: 0, totalRevenue: 0 }
-        });
-    } catch (error) {
-        res.status(500).json({
-            success: false,
-            message: error.message
-        });
-    }
-});
-
-// 8. Kiểm tra vé còn trống cho sự kiện
+// GET /api/events/:eventId/availability - Check ticket availability
 router.get('/:eventId/availability', async (req, res) => {
     try {
         const { eventId } = req.params;
@@ -140,10 +307,11 @@ router.get('/:eventId/availability', async (req, res) => {
             });
         }
 
+        const Ticket = require('../models/Ticket');
         const ticketsSold = await Ticket.aggregate([
             {
                 $match: {
-                    event: mongoose.Types.ObjectId(eventId),
+                    event: new mongoose.Types.ObjectId(eventId),
                     paymentStatus: 'paid'
                 }
             },
@@ -176,60 +344,12 @@ router.get('/:eventId/availability', async (req, res) => {
     }
 });
 
-// 9. Doanh thu theo sự kiện
-router.get('/revenue/by-event', protect, authorize('admin'), async (req, res) => {
-    try {
-        const revenueByEvent = await Ticket.aggregate([
-            {
-                $match: { paymentStatus: 'paid' }
-            },
-            {
-                $group: {
-                    _id: '$event',
-                    totalRevenue: { $sum: '$totalAmount' },
-                    totalTickets: { $sum: '$quantity' }
-                }
-            },
-            {
-                $lookup: {
-                    from: 'events',
-                    localField: '_id',
-                    foreignField: '_id',
-                    as: 'event'
-                }
-            },
-            {
-                $unwind: '$event'
-            },
-            {
-                $project: {
-                    eventName: '$event.title',
-                    totalRevenue: 1,
-                    totalTickets: 1
-                }
-            },
-            {
-                $sort: { totalRevenue: -1 }
-            }
-        ]);
-
-        res.json({
-            success: true,
-            data: revenueByEvent
-        });
-    } catch (error) {
-        res.status(500).json({
-            success: false,
-            message: error.message
-        });
-    }
-});
-
-// 10. Top sự kiện được đăng ký nhiều nhất
+// GET /api/events/top/registered - Top registered events
 router.get('/top/registered', async (req, res) => {
     try {
         const { limit = 10 } = req.query;
 
+        const Ticket = require('../models/Ticket');
         const topEvents = await Ticket.aggregate([
             {
                 $match: { paymentStatus: 'paid' }
@@ -279,8 +399,8 @@ router.get('/top/registered', async (req, res) => {
     }
 });
 
-// 11. Lấy sự kiện trong khoảng thời gian
-router.get('/time-range', async (req, res) => {
+// GET /api/events/time-range - Events in time range
+router.get('/time-range/time-range', async (req, res) => {
     try {
         const { startDate, endDate, page = 1, limit = 10 } = req.query;
 
@@ -298,7 +418,6 @@ router.get('/time-range', async (req, res) => {
         }
 
         const events = await Event.find(dateQuery)
-            .populate('category', 'name')
             .skip((page - 1) * limit)
             .limit(parseInt(limit))
             .sort('dateTime.start');
@@ -316,7 +435,7 @@ router.get('/time-range', async (req, res) => {
     }
 });
 
-// 12. Sự kiện có lượt đánh giá cao nhất
+// GET /api/events/top/rated - Top rated events
 router.get('/top/rated', async (req, res) => {
     try {
         const { limit = 10, minReviews = 1 } = req.query;
@@ -325,8 +444,7 @@ router.get('/top/rated', async (req, res) => {
             totalReviews: { $gte: parseInt(minReviews) }
         })
             .sort({ averageRating: -1, totalReviews: -1 })
-            .limit(parseInt(limit))
-            .populate('category', 'name');
+            .limit(parseInt(limit));
 
         res.json({
             success: true,
@@ -340,24 +458,13 @@ router.get('/top/rated', async (req, res) => {
     }
 });
 
-// 14. Lấy thông tin chi tiết sự kiện cùng ban tổ chức
-router.get('/:eventId/details', async (req, res) => {
+// GET /api/events/categories - Get all categories
+router.get('/categories/categories', async (req, res) => {
     try {
-        const { eventId } = req.params;
-
-        const event = await Event.findById(eventId)
-            .populate('category', 'name description');
-
-        if (!event) {
-            return res.status(404).json({
-                success: false,
-                message: 'Event not found'
-            });
-        }
-
+        const categories = await Event.distinct('category');
         res.json({
             success: true,
-            data: event
+            data: categories
         });
     } catch (error) {
         res.status(500).json({
@@ -367,37 +474,35 @@ router.get('/:eventId/details', async (req, res) => {
     }
 });
 
-// 15. Lấy danh mục sự kiện và số lượng sự kiện
+// GET /api/events/categories/with-count - Categories with event count
 router.get('/categories/with-count', async (req, res) => {
     try {
-        const categoriesWithCount = await Category.aggregate([
+        const categoriesWithCount = await Event.aggregate([
             {
-                $lookup: {
-                    from: 'events',
-                    localField: '_id',
-                    foreignField: 'category',
-                    as: 'events'
+                $group: {
+                    _id: '$category',
+                    eventCount: { $sum: 1 },
+                    upcomingEvents: {
+                        $sum: {
+                            $cond: [
+                                {
+                                    $and: [
+                                        { $gte: ['$dateTime.start', new Date()] },
+                                        { $eq: ['$status', 'upcoming'] }
+                                    ]
+                                },
+                                1,
+                                0
+                            ]
+                        }
+                    }
                 }
             },
             {
                 $project: {
-                    name: 1,
-                    description: 1,
-                    eventCount: { $size: '$events' },
-                    upcomingEvents: {
-                        $size: {
-                            $filter: {
-                                input: '$events',
-                                as: 'event',
-                                cond: {
-                                    $and: [
-                                        { $gte: ['$$event.dateTime.start', new Date()] },
-                                        { $eq: ['$$event.status', 'upcoming'] }
-                                    ]
-                                }
-                            }
-                        }
-                    }
+                    name: '$_id',
+                    eventCount: 1,
+                    upcomingEvents: 1
                 }
             },
             {
@@ -406,7 +511,7 @@ router.get('/categories/with-count', async (req, res) => {
         ]);
 
         res.json({
-            success: true,
+            success: false,
             data: categoriesWithCount
         });
     } catch (error) {

@@ -245,6 +245,21 @@
     </section>
 </div>
 
+<!-- Add to your navigation -->
+<nav>
+    <a href="#" onclick="showSection('events')">Events</a>
+    <a href="#" onclick="showSection('myTickets')">My Tickets</a>
+    <!-- ... existing nav items ... -->
+</nav>
+
+<!-- Add this section -->
+<section id="myTickets" class="section hidden">
+    <h2>My Tickets</h2>
+    <div id="ticketsContainer">
+        <p>Loading your tickets...</p>
+    </div>
+</section>
+
 <script src="script.js"></script>
 </body>
 </html>
