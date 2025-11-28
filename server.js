@@ -154,6 +154,304 @@ const authorize = (...roles) => {
     };
 };
 
+// ==================== AUTH ROUTES ====================
+
+app.post('/api/auth/register', async (req, res) => {
+    try {
+        const { name, email, password, role, phone } = req.body;
+
+        const existingUser = await User.findOne({ email });
+        if (existingUser) {
+            return res.status(400).json({
+                success: false,
+                message: 'User already exists with this email'
+            });
+        }
+
+        const hashedPassword = await bcrypt.hash(password, 12);
+        const user = await User.create({
+            name,
+            email,
+            password: hashedPassword,
+            role: role || 'user',
+            phone
+        });
+
+        const token = jwt.sign(
+            { id: user._id },
+            process.env.JWT_SECRET || 'fallback-secret-key',
+            { expiresIn: '30d' }
+        );
+
+        res.status(201).json({
+            success: true,
+            token,
+            data: {
+                user: {
+                    id: user._id,
+                    name: user.name,
+                    email: user.email,
+                    role: user.role
+                }
+            }
+        });
+    } catch (error) {
+        res.status(400).json({
+            success: false,
+            message: error.message
+        });
+    }
+});
+
+app.post('/api/auth/login', async (req, res) => {
+    try {
+        const { email, password } = req.body;
+
+        if (!email || !password) {
+            return res.status(400).json({
+                success: false,
+                message: 'Please provide email and password'
+            });
+        }
+
+        const user = await User.findOne({ email });
+        if (!user) {
+            return res.status(401).json({
+                success: false,
+                message: 'Invalid email or password'
+            });
+        }
+
+        const isPasswordCorrect = await bcrypt.compare(password, user.password);
+        if (!isPasswordCorrect) {
+            return res.status(401).json({
+                success: false,
+                message: 'Invalid email or password'
+            });
+        }
+
+        const token = jwt.sign(
+            { id: user._id },
+            process.env.JWT_SECRET || 'fallback-secret-key',
+            { expiresIn: '30d' }
+        );
+
+        res.json({
+            success: true,
+            token,
+            data: {
+                user: {
+                    id: user._id,
+                    name: user.name,
+                    email: user.email,
+                    role: user.role
+                }
+            }
+        });
+    } catch (error) {
+        res.status(400).json({
+            success: false,
+            message: error.message
+        });
+    }
+});
+
+// ==================== EVENT ROUTES ====================
+
+// MAIN EVENTS ROUTE - This was missing!
+app.get('/api/events', async (req, res) => {
+    try {
+        const { page = 1, limit = 10, category, status, search } = req.query;
+
+        let query = {};
+
+        if (category) {
+            query.category = category;
+        }
+
+        if (status) {
+            query.status = status;
+        }
+
+        if (search) {
+            query.$or = [
+                { title: { $regex: search, $options: 'i' } },
+                { description: { $regex: search, $options: 'i' } },
+                { 'location.venue': { $regex: search, $options: 'i' } },
+                { 'location.city': { $regex: search, $options: 'i' } }
+            ];
+        }
+
+        const events = await Event.find(query)
+            .skip((page - 1) * limit)
+            .limit(parseInt(limit))
+            .sort('dateTime.start');
+
+        const totalEvents = await Event.countDocuments(query);
+
+        res.json({
+            success: true,
+            count: events.length,
+            total: totalEvents,
+            data: events,
+            pagination: {
+                page: parseInt(page),
+                limit: parseInt(limit),
+                pages: Math.ceil(totalEvents / limit)
+            }
+        });
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: error.message
+        });
+    }
+});
+
+// Create New Event
+app.post('/api/events', protect, authorize('admin'), async (req, res) => {
+    try {
+        const {
+            title,
+            description,
+            category,
+            venue,
+            city,
+            country,
+            startDate,
+            endDate,
+            organizerName,
+            organizerEmail,
+            organizerPhone,
+            capacity,
+            ticketPrice
+        } = req.body;
+
+        // Validation
+        if (!title || !description || !category || !venue || !city || !country ||
+            !startDate || !endDate || !organizerName || !organizerEmail || !organizerPhone ||
+            !capacity || !ticketPrice) {
+            return res.status(400).json({
+                success: false,
+                message: 'All fields are required'
+            });
+        }
+
+        const event = await Event.create({
+            title,
+            description,
+            category,
+            location: {
+                venue,
+                city,
+                country
+            },
+            dateTime: {
+                start: new Date(startDate),
+                end: new Date(endDate)
+            },
+            organizer: {
+                name: organizerName,
+                email: organizerEmail,
+                phone: organizerPhone
+            },
+            capacity: parseInt(capacity),
+            ticketPrice: parseFloat(ticketPrice),
+            status: 'upcoming'
+        });
+
+        res.status(201).json({
+            success: true,
+            message: 'Event created successfully',
+            data: event
+        });
+    } catch (error) {
+        res.status(400).json({
+            success: false,
+            message: error.message
+        });
+    }
+});
+
+// Get single event by ID
+app.get('/api/events/:id', async (req, res) => {
+    try {
+        const event = await Event.findById(req.params.id);
+
+        if (!event) {
+            return res.status(404).json({
+                success: false,
+                message: 'Event not found'
+            });
+        }
+
+        res.json({
+            success: true,
+            data: event
+        });
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: error.message
+        });
+    }
+});
+
+// Update event
+app.put('/api/events/:id', protect, authorize('admin'), async (req, res) => {
+    try {
+        const event = await Event.findByIdAndUpdate(req.params.id, req.body, {
+            new: true,
+            runValidators: true
+        });
+
+        if (!event) {
+            return res.status(404).json({
+                success: false,
+                message: 'Event not found'
+            });
+        }
+
+        res.json({
+            success: true,
+            message: 'Event updated successfully',
+            data: event
+        });
+    } catch (error) {
+        res.status(400).json({
+            success: false,
+            message: error.message
+        });
+    }
+});
+
+// Delete event
+app.delete('/api/events/:id', protect, authorize('admin'), async (req, res) => {
+    try {
+        const event = await Event.findByIdAndDelete(req.params.id);
+
+        if (!event) {
+            return res.status(404).json({
+                success: false,
+                message: 'Event not found'
+            });
+        }
+
+        // Also delete associated tickets
+        await Ticket.deleteMany({ event: req.params.id });
+
+        res.json({
+            success: true,
+            message: 'Event deleted successfully'
+        });
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: error.message
+        });
+    }
+});
+
 // ==================== 15 REQUIRED FUNCTIONS ====================
 
 // 1. Lấy danh sách sự kiện sắp diễn ra
@@ -750,163 +1048,7 @@ app.get('/api/events/categories/with-count', async (req, res) => {
     }
 });
 
-// Auth Routes
-app.post('/api/auth/register', async (req, res) => {
-    try {
-        const { name, email, password, role, phone } = req.body;
 
-        const existingUser = await User.findOne({ email });
-        if (existingUser) {
-            return res.status(400).json({
-                success: false,
-                message: 'User already exists with this email'
-            });
-        }
-
-        const hashedPassword = await bcrypt.hash(password, 12);
-        const user = await User.create({
-            name,
-            email,
-            password: hashedPassword,
-            role: role || 'user',
-            phone
-        });
-
-        const token = jwt.sign(
-            { id: user._id },
-            process.env.JWT_SECRET || 'fallback-secret-key',
-            { expiresIn: '30d' }
-        );
-
-        res.status(201).json({
-            success: true,
-            token,
-            data: {
-                user: {
-                    id: user._id,
-                    name: user.name,
-                    email: user.email,
-                    role: user.role
-                }
-            }
-        });
-    } catch (error) {
-        res.status(400).json({
-            success: false,
-            message: error.message
-        });
-    }
-});
-
-app.post('/api/auth/login', async (req, res) => {
-    try {
-        const { email, password } = req.body;
-
-        if (!email || !password) {
-            return res.status(400).json({
-                success: false,
-                message: 'Please provide email and password'
-            });
-        }
-
-        const user = await User.findOne({ email });
-        if (!user) {
-            return res.status(401).json({
-                success: false,
-                message: 'Invalid email or password'
-            });
-        }
-
-        const isPasswordCorrect = await bcrypt.compare(password, user.password);
-        if (!isPasswordCorrect) {
-            return res.status(401).json({
-                success: false,
-                message: 'Invalid email or password'
-            });
-        }
-
-        const token = jwt.sign(
-            { id: user._id },
-            process.env.JWT_SECRET || 'fallback-secret-key',
-            { expiresIn: '30d' }
-        );
-
-        res.json({
-            success: true,
-            token,
-            data: {
-                user: {
-                    id: user._id,
-                    name: user.name,
-                    email: user.email,
-                    role: user.role
-                }
-            }
-        });
-    } catch (error) {
-        res.status(400).json({
-            success: false,
-            message: error.message
-        });
-    }
-});
-
-// Create New Event
-app.post('/api/events', protect, authorize('admin'), async (req, res) => {
-    try {
-        const {
-            title,
-            description,
-            category,
-            venue,
-            city,
-            country,
-            startDate,
-            endDate,
-            organizerName,
-            organizerEmail,
-            organizerPhone,
-            capacity,
-            ticketPrice
-        } = req.body;
-
-        const event = await Event.create({
-            title,
-            description,
-            category,
-            location: {
-                venue,
-                city,
-                country
-            },
-            dateTime: {
-                start: new Date(startDate),
-                end: new Date(endDate)
-            },
-            organizer: {
-                name: organizerName,
-                email: organizerEmail,
-                phone: organizerPhone
-            },
-            capacity: parseInt(capacity),
-            ticketPrice: parseFloat(ticketPrice),
-            status: 'upcoming'
-        });
-
-        res.status(201).json({
-            success: true,
-            message: 'Event created successfully',
-            data: event
-        });
-    } catch (error) {
-        res.status(400).json({
-            success: false,
-            message: error.message
-        });
-    }
-});
-
-// Get all categories
 app.get('/api/events/categories', async (req, res) => {
     try {
         const categories = await Event.distinct('category');
@@ -969,6 +1111,72 @@ app.get('/api/admin/dashboard', protect, authorize('admin'), async (req, res) =>
     }
 });
 
+
+// Create ticket
+app.post('/api/tickets', protect, async (req, res) => {
+    try {
+        const { eventId, quantity } = req.body;
+        const userId = req.user._id;
+
+        const event = await Event.findById(eventId);
+        if (!event) {
+            return res.status(404).json({
+                success: false,
+                message: 'Event not found'
+            });
+        }
+
+        // Check availability
+        const ticketsSold = await Ticket.aggregate([
+            {
+                $match: {
+                    event: new mongoose.Types.ObjectId(eventId),
+                    paymentStatus: 'paid'
+                }
+            },
+            {
+                $group: {
+                    _id: '$event',
+                    totalTicketsSold: { $sum: '$quantity' }
+                }
+            }
+        ]);
+
+        const sold = ticketsSold[0]?.totalTicketsSold || 0;
+        const available = event.capacity - sold;
+
+        if (available < quantity) {
+            return res.status(400).json({
+                success: false,
+                message: `Not enough tickets available. Only ${available} tickets left.`
+            });
+        }
+
+        const totalAmount = quantity * event.ticketPrice;
+        const ticketNumber = 'TICKET-' + Date.now() + '-' + Math.random().toString(36).substr(2, 9);
+
+        const ticket = await Ticket.create({
+            event: eventId,
+            user: userId,
+            ticketNumber,
+            quantity,
+            totalAmount,
+            paymentStatus: 'pending'
+        });
+
+        res.status(201).json({
+            success: true,
+            message: 'Ticket created successfully',
+            data: ticket
+        });
+    } catch (error) {
+        res.status(400).json({
+            success: false,
+            message: error.message
+        });
+    }
+});
+
 // API Home
 app.get('/api', (req, res) => {
     res.json({
@@ -978,14 +1186,19 @@ app.get('/api', (req, res) => {
             auth: '/api/auth',
             events: '/api/events',
             users: '/api/users',
-            admin: '/api/admin'
+            admin: '/api/admin',
+            tickets: '/api/tickets'
         }
     });
 });
 
-// Serve frontend for all other routes
 app.get('*', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'index.html'));
+});
+
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+    console.log(`Server is running on port ${PORT}`);
 });
 
 // Export for Vercel

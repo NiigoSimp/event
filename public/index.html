@@ -389,7 +389,7 @@
 <body>
 <nav class="navbar">
     <div class="nav-container">
-        <h1 class="logo">EventHub</h1>
+        <h1 class="logo">C-Event</h1>
         <div class="nav-links">
             <a href="#" class="nav-link" onclick="showSection('home')">Home</a>
             <a href="#" class="nav-link" onclick="showSection('events')">Events</a>
@@ -407,8 +407,8 @@
     <!-- Home Section -->
     <section id="home" class="section active">
         <div class="hero">
-            <h2>Welcome to EventHub</h2>
-            <p>Discover amazing events and book your tickets easily</p>
+            <h2>Welcome to C-Event</h2>
+            <p>Discover amazing events and book your tickets today</p>
             <button class="btn-primary" onclick="showSection('events')">Browse Events</button>
         </div>
 
@@ -444,6 +444,7 @@
                 <option value="">All Categories</option>
             </select>
             <button class="btn-secondary" onclick="loadEvents()">Refresh</button>
+            <button class="btn-success" onclick="testEventCreation()" id="testEventBtn" style="display: none;">Test Event Creation</button>
         </div>
 
         <div class="category-buttons" id="categoryButtons">
@@ -479,9 +480,9 @@
                             <option value="Business">Business</option>
                             <option value="Sports">Sports</option>
                             <option value="Education">Education</option>
-                            <option value="Arts">Arts & Culture</option>
-                            <option value="Food">Food & Drink</option>
-                            <option value="Health">Health & Wellness</option>
+                            <option value="Arts and Culture">Arts and Culture</option>
+                            <option value="Food and Drink">Food and Drink</option>
+                            <option value="Health and Wellness">Health and Wellness</option>
                             <option value="Other">Other</option>
                         </select>
                     </div>
@@ -630,6 +631,7 @@
                 <button class="btn-primary" onclick="loadAdminStats()">Refresh Stats</button>
                 <button class="btn-secondary" onclick="loadTopEvents()">Top Events</button>
                 <button class="btn-success" onclick="showSection('create-event')">Create New Event</button>
+                <button class="btn-secondary" onclick="testEventCreation()">Test Event Creation</button>
             </div>
             <div id="adminData"></div>
         </div>
@@ -750,6 +752,7 @@
         const adminLink = document.getElementById('adminLink');
         const createEventLink = document.getElementById('createEventLink');
         const profileLink = document.getElementById('profileLink');
+        const testEventBtn = document.getElementById('testEventBtn');
 
         if (currentUser) {
             loginLink.style.display = 'none';
@@ -760,9 +763,11 @@
             if (currentUser.role === 'admin') {
                 adminLink.style.display = 'block';
                 createEventLink.style.display = 'block';
+                testEventBtn.style.display = 'block';
             } else {
                 adminLink.style.display = 'none';
                 createEventLink.style.display = 'none';
+                testEventBtn.style.display = 'none';
             }
         } else {
             loginLink.style.display = 'block';
@@ -771,10 +776,11 @@
             adminLink.style.display = 'none';
             createEventLink.style.display = 'none';
             profileLink.style.display = 'none';
+            testEventBtn.style.display = 'none';
         }
     }
 
-    // Event Creation
+    // Event Creation - FIXED VERSION
     async function createEvent(event) {
         event.preventDefault();
 
@@ -783,6 +789,10 @@
             return;
         }
 
+        // Format dates properly for backend
+        const startDate = new Date(document.getElementById('eventStartDate').value);
+        const endDate = new Date(document.getElementById('eventEndDate').value);
+
         const eventData = {
             title: document.getElementById('eventTitle').value,
             description: document.getElementById('eventDescription').value,
@@ -790,14 +800,16 @@
             venue: document.getElementById('eventVenue').value,
             city: document.getElementById('eventCity').value,
             country: document.getElementById('eventCountry').value,
-            startDate: document.getElementById('eventStartDate').value,
-            endDate: document.getElementById('eventEndDate').value,
+            startDate: startDate.toISOString(),  // Convert to ISO string
+            endDate: endDate.toISOString(),      // Convert to ISO string
             organizerName: document.getElementById('organizerName').value,
             organizerEmail: document.getElementById('organizerEmail').value,
             organizerPhone: document.getElementById('organizerPhone').value,
-            capacity: document.getElementById('eventCapacity').value,
-            ticketPrice: document.getElementById('eventPrice').value
+            capacity: parseInt(document.getElementById('eventCapacity').value),
+            ticketPrice: parseFloat(document.getElementById('eventPrice').value)
         };
+
+        console.log('Sending event data:', eventData); // Debug log
 
         try {
             const response = await fetch(`${API_BASE}/events`, {
@@ -810,6 +822,8 @@
             });
 
             const data = await response.json();
+            console.log('Response:', data); // Debug log
+
             if (data.success) {
                 showMessage('Event created successfully!', 'success');
                 event.target.reset();
@@ -817,20 +831,82 @@
                 loadCategories();
                 showSection('events');
             } else {
-                showMessage(data.message, 'error');
+                showMessage(data.message || 'Failed to create event', 'error');
             }
         } catch (error) {
-            showMessage('Failed to create event', 'error');
+            console.error('Error creating event:', error);
+            showMessage('Failed to create event: ' + error.message, 'error');
         }
     }
 
-    // Event Functions
+    // Debug function to test event creation
+    async function testEventCreation() {
+        if (!currentUser || currentUser.role !== 'admin') {
+            showMessage('Please login as admin first', 'error');
+            return;
+        }
+
+        const testData = {
+            title: "Test Event " + new Date().getTime(),
+            description: "This is a test event",
+            category: "Technology",
+            venue: "Test Venue",
+            city: "Test City",
+            country: "Test Country",
+            startDate: new Date(Date.now() + 86400000).toISOString(), // Tomorrow
+            endDate: new Date(Date.now() + 90000000).toISOString(),   // Tomorrow + 1 hour
+            organizerName: currentUser.name,
+            organizerEmail: currentUser.email,
+            organizerPhone: "+1234567890",
+            capacity: 100,
+            ticketPrice: 25.00
+        };
+
+        try {
+            const response = await fetch(`${API_BASE}/events`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${authToken}`
+                },
+                body: JSON.stringify(testData)
+            });
+
+            const data = await response.json();
+            console.log('Test Event Response:', data);
+
+            if (data.success) {
+                showMessage('Test event created successfully!', 'success');
+                loadEvents();
+            } else {
+                showMessage('Test failed: ' + data.message, 'error');
+            }
+        } catch (error) {
+            showMessage('Test failed: ' + error.message, 'error');
+        }
+    }
+
+    // Event Functions - IMPROVED VERSION
     async function loadEvents() {
         try {
-            const response = await fetch(`${API_BASE}/events/upcoming`);
-            const data = await response.json();
-            if (data.success) displayEvents(data.data);
+            // Try the main events endpoint first, fallback to upcoming
+            let response = await fetch(`${API_BASE}/events?limit=50`);
+            let data = await response.json();
+
+            // If main endpoint fails, try upcoming events
+            if (!data.success) {
+                response = await fetch(`${API_BASE}/events/upcoming`);
+                data = await response.json();
+            }
+
+            if (data.success) {
+                displayEvents(data.data);
+                updateHomeStats(data.data);
+            } else {
+                showMessage('Failed to load events', 'error');
+            }
         } catch (error) {
+            console.error('Error loading events:', error);
             showMessage('Failed to load events', 'error');
         }
     }
@@ -1021,6 +1097,15 @@
     }
 
     // Utility Functions
+    function updateHomeStats(events) {
+        document.getElementById('totalEvents').textContent = events.length;
+        document.getElementById('upcomingEvents').textContent = events.length;
+
+        // Count unique categories for stats
+        const uniqueCategories = new Set(events.map(event => event.category));
+        document.getElementById('totalUsers').textContent = uniqueCategories.size + '+ Categories';
+    }
+
     async function loadHomeStats() {
         try {
             const eventsResponse = await fetch(`${API_BASE}/events/upcoming`);
