@@ -377,3 +377,43 @@ body {
         justify-content: center;
     }
 }
+
+.form-section {
+    background: white;
+    padding: 1.5rem;
+    border-radius: 8px;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 2px 5px rgba(136, 68, 153, 0.1);
+    border-left: 4px solid #8888CC;
+}
+
+.form-section h3 {
+    color: #884499;
+    margin-bottom: 1rem;
+    border-bottom: 2px solid #DDAACC;
+    padding-bottom: 0.5rem;
+}
+
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+}
+
+.btn-success {
+    background: #CCAA88;
+    color: white;
+    padding: 0.8rem 2rem;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: background-color 0.3s;
+    box-shadow: 0 2px 5px rgba(204, 170, 136, 0.3);
+}
+
+.btn-success:hover {
+    background: #AA8866;
+}
+
+/* Make sure your JavaScript has the createEvent function */

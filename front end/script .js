@@ -20,6 +20,13 @@ function showSection(sectionId) {
 
     // Show selected section
     document.getElementById(sectionId).classList.add('active');
+
+    // Load specific section data
+    if (sectionId === 'profile' && currentUser) {
+        loadProfile();
+    } else if (sectionId === 'admin' && currentUser && currentUser.role === 'admin') {
+        loadAdminStats();
+    }
 }
 
 // Authentication Functions
@@ -123,6 +130,7 @@ function updateNavigation() {
     const registerLink = document.getElementById('registerLink');
     const logoutLink = document.getElementById('logoutLink');
     const adminLink = document.getElementById('adminLink');
+    const createEventLink = document.getElementById('createEventLink');
     const profileLink = document.getElementById('profileLink');
 
     if (currentUser) {
@@ -133,28 +141,122 @@ function updateNavigation() {
 
         if (currentUser.role === 'admin') {
             adminLink.style.display = 'block';
+            createEventLink.style.display = 'block';
         } else {
             adminLink.style.display = 'none';
+            createEventLink.style.display = 'none';
         }
     } else {
         loginLink.style.display = 'block';
         registerLink.style.display = 'block';
         logoutLink.style.display = 'none';
         adminLink.style.display = 'none';
+        createEventLink.style.display = 'none';
         profileLink.style.display = 'none';
+    }
+}
+
+// EVENT CREATION FUNCTION - THIS WAS MISSING!
+async function createEvent(event) {
+    event.preventDefault();
+
+    if (!currentUser || currentUser.role !== 'admin') {
+        showMessage('Only administrators can create events', 'error');
+        return;
+    }
+
+    // Get form values
+    const title = document.getElementById('eventTitle').value;
+    const description = document.getElementById('eventDescription').value;
+    const category = document.getElementById('eventCategory').value;
+    const venue = document.getElementById('eventVenue').value;
+    const city = document.getElementById('eventCity').value;
+    const country = document.getElementById('eventCountry').value;
+    const startDate = document.getElementById('eventStartDate').value;
+    const endDate = document.getElementById('eventEndDate').value;
+    const organizerName = document.getElementById('organizerName').value;
+    const organizerEmail = document.getElementById('organizerEmail').value;
+    const organizerPhone = document.getElementById('organizerPhone').value;
+    const capacity = document.getElementById('eventCapacity').value;
+    const ticketPrice = document.getElementById('eventPrice').value;
+
+    // Validate required fields
+    if (!title || !description || !category || !venue || !city || !country ||
+        !startDate || !endDate || !organizerName || !organizerEmail || !organizerPhone ||
+        !capacity || !ticketPrice) {
+        showMessage('Please fill in all required fields', 'error');
+        return;
+    }
+
+    // Create event data object
+    const eventData = {
+        title: title,
+        description: description,
+        category: category,
+        venue: venue,
+        city: city,
+        country: country,
+        startDate: new Date(startDate).toISOString(),
+        endDate: new Date(endDate).toISOString(),
+        organizerName: organizerName,
+        organizerEmail: organizerEmail,
+        organizerPhone: organizerPhone,
+        capacity: parseInt(capacity),
+        ticketPrice: parseFloat(ticketPrice)
+    };
+
+    console.log('Sending event data:', eventData);
+
+    try {
+        const response = await fetch(`${API_BASE}/events`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${authToken}`
+            },
+            body: JSON.stringify(eventData)
+        });
+
+        const data = await response.json();
+        console.log('Server response:', data);
+
+        if (data.success) {
+            showMessage('Event created successfully!', 'success');
+            // Reset form
+            event.target.reset();
+            // Reload events list
+            loadEvents();
+            // Show events section
+            showSection('events');
+        } else {
+            showMessage('Error: ' + (data.message || 'Failed to create event'), 'error');
+        }
+    } catch (error) {
+        console.error('Error creating event:', error);
+        showMessage('Failed to create event: ' + error.message, 'error');
     }
 }
 
 // Event Functions
 async function loadEvents() {
     try {
-        const response = await fetch(`${API_BASE}/events/upcoming`);
-        const data = await response.json();
+        // Try main events endpoint first
+        let response = await fetch(`${API_BASE}/events?limit=50`);
+        let data = await response.json();
+
+        // If main endpoint fails, try upcoming events
+        if (!data.success) {
+            response = await fetch(`${API_BASE}/events/upcoming`);
+            data = await response.json();
+        }
 
         if (data.success) {
             displayEvents(data.data);
+        } else {
+            showMessage('Failed to load events', 'error');
         }
     } catch (error) {
+        console.error('Error loading events:', error);
         showMessage('Failed to load events', 'error');
     }
 }
@@ -162,18 +264,30 @@ async function loadEvents() {
 function displayEvents(events) {
     const eventsList = document.getElementById('eventsList');
 
-    if (events.length === 0) {
-        eventsList.innerHTML = '<div class="loading">No events found</div>';
+    if (!events || events.length === 0) {
+        eventsList.innerHTML = `
+            <div class="loading">
+                <p>No events found.</p>
+                ${currentUser?.role === 'admin' ?
+            '<button class="btn-primary" onclick="showSection(\'create-event\')">Create First Event</button>' :
+            '<p>Check back later for new events.</p>'
+        }
+            </div>
+        `;
         return;
     }
 
     eventsList.innerHTML = events.map(event => `
         <div class="event-card">
+            <span class="event-category">${event.category}</span>
             <h3>${event.title}</h3>
+            <p><strong>Description:</strong> ${event.description}</p>
             <p><strong>Date:</strong> ${new Date(event.dateTime.start).toLocaleDateString()}</p>
-            <p><strong>Location:</strong> ${event.location.venue}</p>
+            <p><strong>Time:</strong> ${new Date(event.dateTime.start).toLocaleTimeString()} - ${new Date(event.dateTime.end).toLocaleTimeString()}</p>
+            <p><strong>Location:</strong> ${event.location.venue}, ${event.location.city}</p>
             <p><strong>Price:</strong> $<span class="event-price">${event.ticketPrice}</span></p>
-            <p><strong>Capacity:</strong> ${event.capacity}</p>
+            <p><strong>Capacity:</strong> ${event.capacity} people</p>
+            <p><strong>Organizer:</strong> ${event.organizer.name}</p>
             <span class="event-status status-${event.status}">${event.status}</span>
             <div style="margin-top: 1rem;">
                 <button class="btn-primary" onclick="viewEventDetails('${event._id}')">View Details</button>
@@ -185,13 +299,16 @@ function displayEvents(events) {
 
 async function loadCategories() {
     try {
-        const response = await fetch(`${API_BASE}/events/categories/with-count`);
+        const response = await fetch(`${API_BASE}/events/categories`);
         const data = await response.json();
 
         if (data.success) {
+            const categories = data.data;
             const categoryFilter = document.getElementById('categoryFilter');
+
+            // Update category filter
             categoryFilter.innerHTML = '<option value="">All Categories</option>' +
-                data.data.map(cat => `<option value="${cat.name}">${cat.name} (${cat.eventCount})</option>`).join('');
+                categories.map(cat => `<option value="${cat}">${cat}</option>`).join('');
         }
     } catch (error) {
         console.error('Failed to load categories');
@@ -199,13 +316,14 @@ async function loadCategories() {
 }
 
 function searchEvents() {
-    // Simple client-side search - in real app, this would be server-side
     const searchTerm = document.getElementById('searchInput').value.toLowerCase();
     const eventCards = document.querySelectorAll('.event-card');
 
     eventCards.forEach(card => {
         const title = card.querySelector('h3').textContent.toLowerCase();
-        if (title.includes(searchTerm)) {
+        const description = card.querySelector('p').textContent.toLowerCase();
+
+        if (title.includes(searchTerm) || description.includes(searchTerm)) {
             card.style.display = 'block';
         } else {
             card.style.display = 'none';
@@ -214,28 +332,40 @@ function searchEvents() {
 }
 
 function filterEvents() {
-    // Simple client-side filter - in real app, this would be server-side
     const category = document.getElementById('categoryFilter').value;
-    // This would need server-side implementation for proper filtering
-    loadEvents(); // Reload for now
+    const eventCards = document.querySelectorAll('.event-card');
+
+    eventCards.forEach(card => {
+        const categoryElement = card.querySelector('.event-category');
+        if (categoryElement) {
+            const eventCategory = categoryElement.textContent;
+            if (category === '' || eventCategory === category) {
+                card.style.display = 'block';
+            } else {
+                card.style.display = 'none';
+            }
+        }
+    });
 }
 
 // Home Stats
 async function loadHomeStats() {
     try {
-        // For demo purposes - in real app, you'd have dedicated stats endpoints
         const eventsResponse = await fetch(`${API_BASE}/events/upcoming`);
         const eventsData = await eventsResponse.json();
 
         if (eventsData.success) {
-            document.getElementById('totalEvents').textContent = eventsData.count;
-            document.getElementById('upcomingEvents').textContent = eventsData.count;
+            document.getElementById('totalEvents').textContent = eventsData.count || eventsData.data?.length || 0;
+            document.getElementById('upcomingEvents').textContent = eventsData.count || eventsData.data?.length || 0;
         }
 
-        // These would need proper endpoints
-        document.getElementById('totalUsers').textContent = 'Loading...';
+        // For user count, you might need to create a separate endpoint
+        document.getElementById('totalUsers').textContent = 'N/A';
     } catch (error) {
         console.error('Failed to load stats');
+        document.getElementById('totalEvents').textContent = '0';
+        document.getElementById('upcomingEvents').textContent = '0';
+        document.getElementById('totalUsers').textContent = '0';
     }
 }
 
@@ -270,7 +400,7 @@ function displayProfile(profileData) {
             <p><strong>Email:</strong> ${user.email}</p>
             <p><strong>Role:</strong> ${user.role}</p>
             ${user.phone ? `<p><strong>Phone:</strong> ${user.phone}</p>` : ''}
-            <p><strong>Total Tickets:</strong> ${profileData.ticketStats.totalTickets}</p>
+            <p><strong>Total Tickets:</strong> ${profileData.ticketStats?.totalTickets || 0}</p>
         </div>
     `;
 
@@ -278,6 +408,8 @@ function displayProfile(profileData) {
 }
 
 async function loadUserTickets() {
+    if (!currentUser) return;
+
     try {
         const response = await fetch(`${API_BASE}/users/${currentUser.id}/booking-history`, {
             headers: {
@@ -297,7 +429,7 @@ async function loadUserTickets() {
 function displayUserTickets(tickets) {
     const ticketsList = document.getElementById('ticketsList');
 
-    if (tickets.length === 0) {
+    if (!tickets || tickets.length === 0) {
         ticketsList.innerHTML = '<p>No tickets booked yet.</p>';
         return;
     }
@@ -305,7 +437,7 @@ function displayUserTickets(tickets) {
     ticketsList.innerHTML = tickets.map(ticket => `
         <div class="ticket-card">
             <h4>Ticket #${ticket.ticketNumber}</h4>
-            <p><strong>Event:</strong> ${ticket.event.title}</p>
+            <p><strong>Event:</strong> ${ticket.event?.title || 'Event details not available'}</p>
             <p><strong>Quantity:</strong> ${ticket.quantity}</p>
             <p><strong>Total Amount:</strong> $${ticket.totalAmount}</p>
             <p><strong>Status:</strong> ${ticket.paymentStatus}</p>
@@ -340,19 +472,19 @@ function displayAdminStats(stats) {
 
     adminStats.innerHTML = `
         <div class="stat-card">
-            <h3>${overview.totalUsers}</h3>
+            <h3>${overview.totalUsers || 0}</h3>
             <p>Total Users</p>
         </div>
         <div class="stat-card">
-            <h3>${overview.totalEvents}</h3>
+            <h3>${overview.totalEvents || 0}</h3>
             <p>Total Events</p>
         </div>
         <div class="stat-card">
-            <h3>${overview.totalTickets}</h3>
+            <h3>${overview.totalTickets || 0}</h3>
             <p>Total Tickets</p>
         </div>
         <div class="stat-card">
-            <h3>$${overview.totalRevenue}</h3>
+            <h3>$${overview.totalRevenue || 0}</h3>
             <p>Total Revenue</p>
         </div>
     `;
@@ -378,6 +510,11 @@ async function loadPaymentSummary() {
 function displayPaymentSummary(summary) {
     const adminData = document.getElementById('adminData');
 
+    if (!summary || summary.length === 0) {
+        adminData.innerHTML = '<p>No payment data available.</p>';
+        return;
+    }
+
     adminData.innerHTML = `
         <h3>Payment Summary by Event</h3>
         ${summary.map(event => `
@@ -386,11 +523,11 @@ function displayPaymentSummary(summary) {
                 <p>Total Tickets: ${event.totalTickets}</p>
                 <p>Total Revenue: $${event.totalAmount}</p>
                 <div style="margin-top: 0.5rem;">
-                    ${event.paymentStatuses.map(status => `
+                    ${event.paymentStatuses ? event.paymentStatuses.map(status => `
                         <small style="display: inline-block; margin-right: 1rem;">
                             ${status.status}: ${status.tickets} tickets ($${status.amount})
                         </small>
-                    `).join('')}
+                    `).join('') : 'No payment status data'}
                 </div>
             </div>
         `).join('')}
@@ -412,6 +549,11 @@ async function loadTopEvents() {
 
 function displayTopEvents(events) {
     const adminData = document.getElementById('adminData');
+
+    if (!events || events.length === 0) {
+        adminData.innerHTML = '<p>No event registration data available.</p>';
+        return;
+    }
 
     adminData.innerHTML = `
         <h3>Top 5 Most Registered Events</h3>
@@ -441,27 +583,35 @@ function showMessage(message, type) {
 
     // Auto remove after 5 seconds
     setTimeout(() => {
-        messageDiv.remove();
+        if (messageDiv.parentNode) {
+            messageDiv.remove();
+        }
     }, 5000);
 }
 
 // Placeholder functions for future implementation
 function viewEventDetails(eventId) {
-    showMessage('Event details feature coming soon!', 'success');
+    showMessage('Event details feature coming soon!', 'info');
 }
 
 function bookTicket(eventId) {
-    showMessage('Ticket booking feature coming soon!', 'success');
+    showMessage('Ticket booking feature coming soon!', 'info');
 }
 
-// Update the showSection function to load profile when needed
-const originalShowSection = showSection;
-showSection = function(sectionId) {
-    originalShowSection(sectionId);
-
-    if (sectionId === 'profile' && currentUser) {
-        loadProfile();
-    } else if (sectionId === 'admin' && currentUser && currentUser.role === 'admin') {
-        loadAdminStats();
+// Debug function to test the API connection
+async function testConnection() {
+    try {
+        const response = await fetch(`${API_BASE}`);
+        const data = await response.json();
+        console.log('API Connection test:', data);
+        return data;
+    } catch (error) {
+        console.error('API Connection failed:', error);
+        return null;
     }
-};
+}
+
+// Test connection on load
+window.addEventListener('load', () => {
+    testConnection();
+});
