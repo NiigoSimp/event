@@ -13,7 +13,7 @@ app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
 // MongoDB Connection
-const MONGODB_URI = process.env.MONGODB_URI || 'mongodb+srv://Zmz:ILoveZmz@cluster0.qzzflwg.mongodb.net/event-management-DB?appName=Cluster0';
+const MONGODB_URI = process.env.MONGODB_URI || 'mongodb+srv://Zmz:ILoveZmz@cluster0.qzzflwg.mongodb.net/event-management-DB?retryWrites=true&w=majority';
 
 mongoose.connect(MONGODB_URI, {
     useNewUrlParser: true,
@@ -23,9 +23,12 @@ mongoose.connect(MONGODB_URI, {
         console.log('MongoDB Connected Successfully');
         initializeAdmin();
     })
-    .catch(err => console.error('MongoDB connection error:', err));
+    .catch(err => {
+        console.error('MongoDB connection error:', err);
+        process.exit(1);
+    });
 
-// Models
+// Models - SINGLE SCHEMA DEFINITIONS
 const userSchema = new mongoose.Schema({
     name: { type: String, required: true },
     email: { type: String, required: true, unique: true },
@@ -36,33 +39,82 @@ const userSchema = new mongoose.Schema({
 });
 
 const eventSchema = new mongoose.Schema({
-    title: { type: String, required: true },
-    description: { type: String, required: true },
-    category: { type: String, required: true },
+    title: {
+        type: String,
+        required: true,
+        trim: true
+    },
+    description: {
+        type: String,
+        required: true
+    },
+    category: {
+        type: String,
+        required: true
+    },
     location: {
-        venue: { type: String, required: true },
-        city: { type: String, required: true },
-        country: { type: String, required: true }
+        venue: {
+            type: String,
+            required: true
+        },
+        city: {
+            type: String,
+            required: true
+        },
+        country: {
+            type: String,
+            required: true
+        }
     },
     dateTime: {
-        start: { type: Date, required: true },
-        end: { type: Date, required: true }
+        start: {
+            type: Date,
+            required: true
+        },
+        end: {
+            type: Date,
+            required: true
+        }
     },
     organizer: {
-        name: { type: String, required: true },
-        email: { type: String, required: true },
-        phone: { type: String, required: true }
+        name: {
+            type: String,
+            required: true
+        },
+        email: {
+            type: String,
+            required: true
+        },
+        phone: {
+            type: String,
+            required: true
+        }
     },
-    capacity: { type: Number, required: true },
-    ticketPrice: { type: Number, required: true },
+    capacity: {
+        type: Number,
+        required: true
+    },
+    ticketPrice: {
+        type: Number,
+        required: true
+    },
     status: {
         type: String,
         enum: ['upcoming', 'ongoing', 'completed', 'cancelled'],
         default: 'upcoming'
     },
-    averageRating: { type: Number, default: 0 },
-    totalReviews: { type: Number, default: 0 },
-    createdAt: { type: Date, default: Date.now }
+    averageRating: {
+        type: Number,
+        default: 0
+    },
+    totalReviews: {
+        type: Number,
+        default: 0
+    },
+    createdAt: {
+        type: Date,
+        default: Date.now
+    }
 });
 
 const ticketSchema = new mongoose.Schema({
@@ -258,7 +310,7 @@ app.post('/api/auth/login', async (req, res) => {
 
 // ==================== EVENT ROUTES ====================
 
-// MAIN EVENTS ROUTE - This was missing!
+// Get all events
 app.get('/api/events', async (req, res) => {
     try {
         const { page = 1, limit = 10, category, status, search } = req.query;
@@ -308,9 +360,12 @@ app.get('/api/events', async (req, res) => {
     }
 });
 
-// Create New Event
+// Create New Event - FIXED VERSION
 app.post('/api/events', protect, authorize('admin'), async (req, res) => {
     try {
+        console.log('=== EVENT CREATION STARTED ===');
+        console.log('Request body:', req.body);
+
         const {
             title,
             description,
@@ -337,7 +392,8 @@ app.post('/api/events', protect, authorize('admin'), async (req, res) => {
             });
         }
 
-        const event = await Event.create({
+        // Create event with proper nested structure
+        const eventData = {
             title,
             description,
             category,
@@ -356,9 +412,15 @@ app.post('/api/events', protect, authorize('admin'), async (req, res) => {
                 phone: organizerPhone
             },
             capacity: parseInt(capacity),
-            ticketPrice: parseFloat(ticketPrice),
-            status: 'upcoming'
-        });
+            ticketPrice: parseFloat(ticketPrice)
+        };
+
+        console.log('Processed event data:', eventData);
+
+        const event = await Event.create(eventData);
+
+        console.log('Event saved successfully:', event._id);
+        console.log('=== EVENT CREATION COMPLETED ===');
 
         res.status(201).json({
             success: true,
@@ -366,9 +428,11 @@ app.post('/api/events', protect, authorize('admin'), async (req, res) => {
             data: event
         });
     } catch (error) {
+        console.error('Error saving event:', error);
         res.status(400).json({
             success: false,
-            message: error.message
+            message: error.message,
+            details: error.errors
         });
     }
 });
@@ -454,7 +518,7 @@ app.delete('/api/events/:id', protect, authorize('admin'), async (req, res) => {
 
 // ==================== 15 REQUIRED FUNCTIONS ====================
 
-// 1. Lấy danh sách sự kiện sắp diễn ra
+// 1. Get upcoming events
 app.get('/api/events/upcoming', async (req, res) => {
     try {
         const events = await Event.find({
@@ -477,7 +541,7 @@ app.get('/api/events/upcoming', async (req, res) => {
     }
 });
 
-// 2. Tìm sự kiện theo thể loại và địa điểm
+// 2. Search events by category and location
 app.get('/api/events/search', async (req, res) => {
     try {
         const { category, location, page = 1, limit = 10 } = req.query;
@@ -514,7 +578,7 @@ app.get('/api/events/search', async (req, res) => {
     }
 });
 
-// 3. Đếm số lượng sự kiện theo trạng thái
+// 3. Count events by status
 app.get('/api/events/count-by-status', protect, authorize('admin'), async (req, res) => {
     try {
         const statusCount = await Event.aggregate([
@@ -538,7 +602,7 @@ app.get('/api/events/count-by-status', protect, authorize('admin'), async (req, 
     }
 });
 
-// 4. Lấy thông tin người dùng và số vé đã đăng ký
+// 4. Get user profile with ticket stats
 app.get('/api/users/:userId/profile', protect, async (req, res) => {
     try {
         const { userId } = req.params;
@@ -591,7 +655,7 @@ app.get('/api/users/:userId/profile', protect, async (req, res) => {
     }
 });
 
-// 5. Tìm thông tin khách hàng theo email
+// 5. Search users by email
 app.get('/api/users/search/by-email', protect, authorize('admin'), async (req, res) => {
     try {
         const { email, page = 1, limit = 10 } = req.query;
@@ -623,7 +687,7 @@ app.get('/api/users/search/by-email', protect, authorize('admin'), async (req, r
     }
 });
 
-// 6. Đếm số vé đã bán cho một sự kiện
+// 6. Get tickets sold for an event
 app.get('/api/events/:eventId/tickets-sold', async (req, res) => {
     try {
         const { eventId } = req.params;
@@ -656,7 +720,7 @@ app.get('/api/events/:eventId/tickets-sold', async (req, res) => {
     }
 });
 
-// 7. Lấy lịch sử đăng ký của khách hàng
+// 7. Get user booking history
 app.get('/api/users/:userId/booking-history', protect, async (req, res) => {
     try {
         const { userId } = req.params;
@@ -700,7 +764,7 @@ app.get('/api/users/:userId/booking-history', protect, async (req, res) => {
     }
 });
 
-// 8. Kiểm tra vé còn trống cho sự kiện
+// 8. Check event availability
 app.get('/api/events/:eventId/availability', async (req, res) => {
     try {
         const { eventId } = req.params;
@@ -749,7 +813,7 @@ app.get('/api/events/:eventId/availability', async (req, res) => {
     }
 });
 
-// 9. Doanh thu theo sự kiện
+// 9. Revenue by event
 app.get('/api/events/revenue/by-event', protect, authorize('admin'), async (req, res) => {
     try {
         const revenueByEvent = await Ticket.aggregate([
@@ -798,7 +862,7 @@ app.get('/api/events/revenue/by-event', protect, authorize('admin'), async (req,
     }
 });
 
-// 10. Top sự kiện được đăng ký nhiều nhất
+// 10. Top registered events
 app.get('/api/events/top/registered', async (req, res) => {
     try {
         const { limit = 10 } = req.query;
@@ -852,7 +916,7 @@ app.get('/api/events/top/registered', async (req, res) => {
     }
 });
 
-// 11. Lấy sự kiện trong khoảng thời gian
+// 11. Events in time range
 app.get('/api/events/time-range', async (req, res) => {
     try {
         const { startDate, endDate, page = 1, limit = 10 } = req.query;
@@ -888,7 +952,7 @@ app.get('/api/events/time-range', async (req, res) => {
     }
 });
 
-// 12. Sự kiện có lượt đánh giá cao nhất
+// 12. Top rated events
 app.get('/api/events/top/rated', async (req, res) => {
     try {
         const { limit = 10, minReviews = 1 } = req.query;
@@ -911,7 +975,7 @@ app.get('/api/events/top/rated', async (req, res) => {
     }
 });
 
-// 13. Tổng hợp trạng thái thanh toán theo sự kiện
+// 13. Payment summary by event
 app.get('/api/admin/payment-summary/by-event', protect, authorize('admin'), async (req, res) => {
     try {
         const paymentSummary = await Ticket.aggregate([
@@ -975,7 +1039,7 @@ app.get('/api/admin/payment-summary/by-event', protect, authorize('admin'), asyn
     }
 });
 
-// 14. Lấy thông tin chi tiết sự kiện cùng ban tổ chức
+// 14. Get event details
 app.get('/api/events/:eventId/details', async (req, res) => {
     try {
         const { eventId } = req.params;
@@ -1000,7 +1064,7 @@ app.get('/api/events/:eventId/details', async (req, res) => {
     }
 });
 
-// 15. Lấy danh mục sự kiện và số lượng sự kiện
+// 15. Categories with count
 app.get('/api/events/categories/with-count', async (req, res) => {
     try {
         const categoriesWithCount = await Event.aggregate([
@@ -1048,7 +1112,7 @@ app.get('/api/events/categories/with-count', async (req, res) => {
     }
 });
 
-
+// Additional utility routes
 app.get('/api/events/categories', async (req, res) => {
     try {
         const categories = await Event.distinct('category');
@@ -1110,7 +1174,6 @@ app.get('/api/admin/dashboard', protect, authorize('admin'), async (req, res) =>
         });
     }
 });
-
 
 // Create ticket
 app.post('/api/tickets', protect, async (req, res) => {

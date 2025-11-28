@@ -1,84 +1,35 @@
-// models/Event.js
-const mongoose = require('mongoose');
+// routes/events.js
+const express = require('express');
+const router = express.Router();
+const Event = require('../models/Event');
 
-const eventSchema = new mongoose.Schema({
-    title: {
-        type: String,
-        required: true,
-        trim: true
-    },
-    description: {
-        type: String,
-        required: true
-    },
-    category: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'Category',
-        required: true
-    },
-    location: {
-        venue: {
-            type: String,
-            required: true
-        },
-        address: {
-            street: String,
-            city: String,
-            country: String
-        },
-        coordinates: {
-            lat: Number,
-            lng: Number
+// POST /api/events - Create new event
+router.post('/', async (req, res) => {
+    try {
+        console.log('Request body:', req.body); // Debug log
+
+        // Validate required fields
+        const { title, description, category, location, dateTime, organizer, capacity, ticketPrice } = req.body;
+
+        if (!title || !description || !category || !location || !dateTime || !organizer || !capacity || !ticketPrice) {
+            return res.status(400).json({
+                error: 'Missing required fields'
+            });
         }
-    },
-    dateTime: {
-        start: {
-            type: Date,
-            required: true
-        },
-        end: {
-            type: Date,
-            required: true
-        }
-    },
-    organizer: {
-        name: {
-            type: String,
-            required: true
-        },
-        contact: {
-            email: String,
-            phone: String
-        }
-    },
-    capacity: {
-        type: Number,
-        required: true
-    },
-    ticketPrice: {
-        type: Number,
-        required: true
-    },
-    status: {
-        type: String,
-        enum: ['upcoming', 'ongoing', 'completed', 'cancelled'],
-        default: 'upcoming'
-    },
-    images: [String],
-    averageRating: {
-        type: Number,
-        default: 0,
-        min: 0,
-        max: 5
-    },
-    totalReviews: {
-        type: Number,
-        default: 0
-    },
-    createdAt: {
-        type: Date,
-        default: Date.now
+
+        const event = new Event(req.body);
+        const savedEvent = await event.save();
+
+        console.log('Event saved successfully:', savedEvent._id); // Debug log
+        res.status(201).json(savedEvent);
+
+    } catch (error) {
+        console.error('Error saving event:', error);
+        res.status(400).json({
+            error: error.message,
+            details: error.errors
+        });
     }
 });
 
-module.exports = mongoose.model('Event', eventSchema);
+module.exports = router;
