@@ -48,6 +48,7 @@ router.get('/', async (req, res) => {
             }
         });
     } catch (error) {
+        console.error(' GET ALL EVENTS ERROR:', error);
         res.status(500).json({
             success: false,
             message: error.message
@@ -123,7 +124,7 @@ router.post('/', protect, authorize('admin'), async (req, res) => {
             data: event
         });
     } catch (error) {
-        console.error('Error saving event:', error);
+        console.error('CREATE EVENT ERROR:', error);
         res.status(400).json({
             success: false,
             message: error.message,
@@ -149,6 +150,7 @@ router.get('/:id', async (req, res) => {
             data: event
         });
     } catch (error) {
+        console.error('GET EVENT BY ID ERROR:', error);
         res.status(500).json({
             success: false,
             message: error.message
@@ -177,6 +179,7 @@ router.put('/:id', protect, authorize('admin'), async (req, res) => {
             data: event
         });
     } catch (error) {
+        console.error('UPDATE EVENT ERROR:', error);
         res.status(400).json({
             success: false,
             message: error.message
@@ -201,6 +204,7 @@ router.delete('/:id', protect, authorize('admin'), async (req, res) => {
             message: 'Event deleted successfully'
         });
     } catch (error) {
+        console.error('DELETE EVENT ERROR:', error);
         res.status(500).json({
             success: false,
             message: error.message
@@ -208,11 +212,10 @@ router.delete('/:id', protect, authorize('admin'), async (req, res) => {
     }
 });
 
-// ==================== ADDITIONAL EVENT ROUTES ====================
-
 // GET /api/events/upcoming - Get upcoming events
-router.get('/upcoming/upcoming', async (req, res) => {
+router.get('/upcoming', async (req, res) => {
     try {
+        console.log('Fetching upcoming events...');
         const events = await Event.find({
             'dateTime.start': { $gte: new Date() },
             status: 'upcoming'
@@ -220,12 +223,15 @@ router.get('/upcoming/upcoming', async (req, res) => {
             .sort('dateTime.start')
             .limit(50);
 
+        console.log(`Found ${events.length} upcoming events`);
+
         res.json({
             success: true,
             count: events.length,
             data: events
         });
     } catch (error) {
+        console.error('UPCOMING EVENTS ERROR:', error);
         res.status(500).json({
             success: false,
             message: error.message
@@ -234,8 +240,9 @@ router.get('/upcoming/upcoming', async (req, res) => {
 });
 
 // GET /api/events/search - Search events by category and location
-router.get('/search/search', async (req, res) => {
+router.get('/search', async (req, res) => {
     try {
+        console.log('Searching events...', req.query);
         const { category, location, page = 1, limit = 10 } = req.query;
 
         let query = {};
@@ -257,12 +264,15 @@ router.get('/search/search', async (req, res) => {
             .limit(parseInt(limit))
             .sort('dateTime.start');
 
+        console.log(`Found ${events.length} events for search`);
+
         res.json({
             success: true,
             count: events.length,
             data: events
         });
     } catch (error) {
+        console.error('SEARCH EVENTS ERROR:', error);
         res.status(500).json({
             success: false,
             message: error.message
@@ -271,8 +281,9 @@ router.get('/search/search', async (req, res) => {
 });
 
 // GET /api/events/count-by-status - Count events by status (Admin only)
-router.get('/count-by-status/count-by-status', protect, authorize('admin'), async (req, res) => {
+router.get('/count-by-status', protect, authorize('admin'), async (req, res) => {
     try {
+        console.log('Counting events by status...');
         const statusCount = await Event.aggregate([
             {
                 $group: {
@@ -282,11 +293,14 @@ router.get('/count-by-status/count-by-status', protect, authorize('admin'), asyn
             }
         ]);
 
+        console.log('Status count result:', statusCount);
+
         res.json({
             success: true,
             data: statusCount
         });
     } catch (error) {
+        console.error('COUNT BY STATUS ERROR:', error);
         res.status(500).json({
             success: false,
             message: error.message
@@ -298,6 +312,7 @@ router.get('/count-by-status/count-by-status', protect, authorize('admin'), asyn
 router.get('/:eventId/availability', async (req, res) => {
     try {
         const { eventId } = req.params;
+        console.log('Checking availability for event:', eventId);
 
         const event = await Event.findById(eventId);
         if (!event) {
@@ -326,6 +341,8 @@ router.get('/:eventId/availability', async (req, res) => {
         const sold = ticketsSold[0]?.totalTicketsSold || 0;
         const available = event.capacity - sold;
 
+        console.log(`Event ${eventId} - Capacity: ${event.capacity}, Sold: ${sold}, Available: ${available}`);
+
         res.json({
             success: true,
             data: {
@@ -337,6 +354,7 @@ router.get('/:eventId/availability', async (req, res) => {
             }
         });
     } catch (error) {
+        console.error('AVAILABILITY CHECK ERROR:', error);
         res.status(500).json({
             success: false,
             message: error.message
@@ -348,6 +366,7 @@ router.get('/:eventId/availability', async (req, res) => {
 router.get('/top/registered', async (req, res) => {
     try {
         const { limit = 10 } = req.query;
+        console.log('Fetching top registered events, limit:', limit);
 
         const Ticket = require('../models/Ticket');
         const topEvents = await Ticket.aggregate([
@@ -387,11 +406,14 @@ router.get('/top/registered', async (req, res) => {
             }
         ]);
 
+        console.log(`Found ${topEvents.length} top registered events`);
+
         res.json({
             success: true,
             data: topEvents
         });
     } catch (error) {
+        console.error('TOP REGISTERED EVENTS ERROR:', error);
         res.status(500).json({
             success: false,
             message: error.message
@@ -400,9 +422,10 @@ router.get('/top/registered', async (req, res) => {
 });
 
 // GET /api/events/time-range - Events in time range
-router.get('/time-range/time-range', async (req, res) => {
+router.get('/time-range', async (req, res) => {
     try {
         const { startDate, endDate, page = 1, limit = 10 } = req.query;
+        console.log('Fetching events in time range:', { startDate, endDate });
 
         let dateQuery = {};
 
@@ -422,12 +445,15 @@ router.get('/time-range/time-range', async (req, res) => {
             .limit(parseInt(limit))
             .sort('dateTime.start');
 
+        console.log(`Found ${events.length} events in time range`);
+
         res.json({
             success: true,
             count: events.length,
             data: events
         });
     } catch (error) {
+        console.error('TIME RANGE EVENTS ERROR:', error);
         res.status(500).json({
             success: false,
             message: error.message
@@ -439,6 +465,7 @@ router.get('/time-range/time-range', async (req, res) => {
 router.get('/top/rated', async (req, res) => {
     try {
         const { limit = 10, minReviews = 1 } = req.query;
+        console.log('Fetching top rated events:', { limit, minReviews });
 
         const topRatedEvents = await Event.find({
             totalReviews: { $gte: parseInt(minReviews) }
@@ -446,11 +473,14 @@ router.get('/top/rated', async (req, res) => {
             .sort({ averageRating: -1, totalReviews: -1 })
             .limit(parseInt(limit));
 
+        console.log(`Found ${topRatedEvents.length} top rated events`);
+
         res.json({
             success: true,
             data: topRatedEvents
         });
     } catch (error) {
+        console.error('TOP RATED EVENTS ERROR:', error);
         res.status(500).json({
             success: false,
             message: error.message
@@ -459,14 +489,19 @@ router.get('/top/rated', async (req, res) => {
 });
 
 // GET /api/events/categories - Get all categories
-router.get('/categories/categories', async (req, res) => {
+router.get('/categories', async (req, res) => {
     try {
+        console.log('Fetching categories...');
         const categories = await Event.distinct('category');
+
+        console.log(`Found ${categories.length} categories:`, categories);
+
         res.json({
             success: true,
             data: categories
         });
     } catch (error) {
+        console.error('CATEGORIES ERROR:', error);
         res.status(500).json({
             success: false,
             message: error.message
@@ -477,6 +512,7 @@ router.get('/categories/categories', async (req, res) => {
 // GET /api/events/categories/with-count - Categories with event count
 router.get('/categories/with-count', async (req, res) => {
     try {
+        console.log('Fetching categories with count...');
         const categoriesWithCount = await Event.aggregate([
             {
                 $group: {
@@ -510,11 +546,14 @@ router.get('/categories/with-count', async (req, res) => {
             }
         ]);
 
+        console.log('Categories with count result:', categoriesWithCount);
+
         res.json({
-            success: false,
+            success: true,
             data: categoriesWithCount
         });
     } catch (error) {
+        console.error('CATEGORIES WITH COUNT ERROR:', error);
         res.status(500).json({
             success: false,
             message: error.message
