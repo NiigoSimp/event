@@ -5,78 +5,384 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Event Management System</title>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; background: #f4f4f4; }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Arial', sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: #f8f8f8;
+        }
 
-        .navbar { background: #2c3e50; color: white; padding: 1rem 0; }
-        .nav-container { max-width: 1200px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; padding: 0 2rem; }
-        .logo { font-size: 1.8rem; font-weight: bold; }
-        .nav-links { display: flex; gap: 2rem; }
-        .nav-link { color: white; text-decoration: none; padding: 0.5rem 1rem; border-radius: 4px; transition: background-color 0.3s; }
-        .nav-link:hover { background-color: #34495e; }
+        .navbar {
+            background: #884499;
+            color: white;
+            padding: 1rem 0;
+            box-shadow: 0 2px 10px rgba(136, 68, 153, 0.3);
+        }
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 2rem;
+        }
+        .logo {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: white;
+        }
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+        }
+        .nav-link {
+            color: white;
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            transition: background-color 0.3s;
+        }
+        .nav-link:hover {
+            background-color: #bb5688;
+        }
 
-        .container { max-width: 1200px; margin: 2rem auto; padding: 0 2rem; }
-        .section { display: none; }
-        .section.active { display: block; }
+        .container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+        }
+        .section {
+            display: none;
+        }
+        .section.active {
+            display: block;
+        }
 
-        .hero { text-align: center; padding: 4rem 0; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border-radius: 10px; margin-bottom: 2rem; }
-        .hero h2 { font-size: 3rem; margin-bottom: 1rem; }
-        .hero p { font-size: 1.2rem; margin-bottom: 2rem; }
+        .hero {
+            text-align: center;
+            padding: 4rem 0;
+            background: linear-gradient(135deg, #884499 0%, #bb5688 100%);
+            color: white;
+            border-radius: 10px;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 15px rgba(136, 68, 153, 0.4);
+        }
+        .hero h2 {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+        .hero p {
+            font-size: 1.2rem;
+            margin-bottom: 2rem;
+            opacity: 0.9;
+        }
 
-        .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 2rem; margin: 2rem 0; }
-        .stat-card { background: white; padding: 2rem; border-radius: 8px; text-align: center; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
-        .stat-card h3 { font-size: 2.5rem; color: #3498db; margin-bottom: 0.5rem; }
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 2rem;
+            margin: 2rem 0;
+        }
+        .stat-card {
+            background: white;
+            padding: 2rem;
+            border-radius: 8px;
+            text-align: center;
+            box-shadow: 0 2px 10px rgba(136, 68, 153, 0.1);
+            border-left: 4px solid #8888CC;
+        }
+        .stat-card h3 {
+            font-size: 2.5rem;
+            color: #884499;
+            margin-bottom: 0.5rem;
+        }
 
-        .btn-primary { background: #3498db; color: white; padding: 0.8rem 2rem; border: none; border-radius: 5px; cursor: pointer; font-size: 1rem; transition: background-color 0.3s; }
-        .btn-primary:hover { background: #2980b9; }
-        .btn-secondary { background: #95a5a6; color: white; padding: 0.8rem 2rem; border: none; border-radius: 5px; cursor: pointer; font-size: 1rem; transition: background-color 0.3s; }
-        .btn-secondary:hover { background: #7f8c8d; }
-        .btn-success { background: #27ae60; color: white; padding: 0.8rem 2rem; border: none; border-radius: 5px; cursor: pointer; font-size: 1rem; transition: background-color 0.3s; }
-        .btn-success:hover { background: #219a52; }
+        .btn-primary {
+            background: #884499;
+            color: white;
+            padding: 0.8rem 2rem;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: background-color 0.3s;
+            box-shadow: 0 2px 5px rgba(136, 68, 153, 0.3);
+        }
+        .btn-primary:hover {
+            background: #bb5688;
+        }
+        .btn-secondary {
+            background: #8888CC;
+            color: white;
+            padding: 0.8rem 2rem;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: background-color 0.3s;
+            box-shadow: 0 2px 5px rgba(136, 136, 204, 0.3);
+        }
+        .btn-secondary:hover {
+            background: #6666AA;
+        }
+        .btn-success {
+            background: #CCAA88;
+            color: white;
+            padding: 0.8rem 2rem;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: background-color 0.3s;
+            box-shadow: 0 2px 5px rgba(204, 170, 136, 0.3);
+        }
+        .btn-success:hover {
+            background: #AA8866;
+        }
 
-        .filters { display: flex; gap: 1rem; margin-bottom: 2rem; flex-wrap: wrap; }
-        .filters input, .filters select { padding: 0.8rem; border: 1px solid #ddd; border-radius: 5px; font-size: 1rem; }
+        .filters {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+        .filters input, .filters select {
+            padding: 0.8rem;
+            border: 1px solid #DDAACC;
+            border-radius: 5px;
+            font-size: 1rem;
+            background: white;
+        }
+        .filters input:focus, .filters select:focus {
+            outline: none;
+            border-color: #884499;
+            box-shadow: 0 0 5px rgba(136, 68, 153, 0.3);
+        }
 
-        .events-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 2rem; }
-        .event-card { background: white; border-radius: 8px; padding: 1.5rem; box-shadow: 0 2px 10px rgba(0,0,0,0.1); transition: transform 0.3s; }
-        .event-card:hover { transform: translateY(-5px); }
-        .event-card h3 { color: #2c3e50; margin-bottom: 1rem; }
-        .event-card p { margin-bottom: 0.5rem; color: #666; }
-        .event-price { font-size: 1.2rem; font-weight: bold; color: #27ae60; }
-        .event-category { display: inline-block; padding: 0.3rem 0.8rem; border-radius: 20px; font-size: 0.8rem; font-weight: bold; background: #e8f4fd; color: #2980b9; margin-bottom: 1rem; }
+        .events-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+        .event-card {
+            background: white;
+            border-radius: 8px;
+            padding: 1.5rem;
+            box-shadow: 0 2px 10px rgba(136, 68, 153, 0.1);
+            transition: transform 0.3s, box-shadow 0.3s;
+            border-top: 3px solid #8888CC;
+        }
+        .event-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 20px rgba(136, 68, 153, 0.2);
+        }
+        .event-card h3 {
+            color: #884499;
+            margin-bottom: 1rem;
+            border-bottom: 2px solid #DDAACC;
+            padding-bottom: 0.5rem;
+        }
+        .event-card p {
+            margin-bottom: 0.5rem;
+            color: #666;
+        }
+        .event-price {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #bb5688;
+        }
+        .event-category {
+            display: inline-block;
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            background: #DDAACC;
+            color: #884499;
+            margin-bottom: 1rem;
+        }
 
-        .auth-form { max-width: 600px; margin: 2rem auto; background: white; padding: 2rem; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
-        .form-group { margin-bottom: 1.5rem; }
-        .form-group label { display: block; margin-bottom: 0.5rem; font-weight: bold; }
-        .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 0.8rem; border: 1px solid #ddd; border-radius: 5px; font-size: 1rem; }
-        .form-group textarea { height: 100px; resize: vertical; }
-        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+        .auth-form {
+            max-width: 600px;
+            margin: 2rem auto;
+            background: white;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(136, 68, 153, 0.1);
+            border-top: 4px solid #CCAA88;
+        }
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: bold;
+            color: #884499;
+        }
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%;
+            padding: 0.8rem;
+            border: 1px solid #DDAACC;
+            border-radius: 5px;
+            font-size: 1rem;
+            background: white;
+        }
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+            outline: none;
+            border-color: #884499;
+            box-shadow: 0 0 5px rgba(136, 68, 153, 0.3);
+        }
+        .form-group textarea {
+            height: 100px;
+            resize: vertical;
+        }
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
 
-        .profile-info, .ticket-card { background: white; padding: 1.5rem; border-radius: 8px; margin-bottom: 1rem; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        .profile-info, .ticket-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            box-shadow: 0 2px 5px rgba(136, 68, 153, 0.1);
+            border-left: 4px solid #8888CC;
+        }
 
-        .admin-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 2rem; }
-        .admin-actions { display: flex; gap: 1rem; margin-bottom: 2rem; flex-wrap: wrap; }
-        .admin-data { background: white; padding: 1.5rem; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        .admin-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+        .admin-actions {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+        .admin-data {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(136, 68, 153, 0.1);
+            border-top: 3px solid #CCAA88;
+        }
 
-        .category-buttons { display: flex; gap: 1rem; margin-bottom: 2rem; flex-wrap: wrap; }
-        .category-btn { background: #ecf0f1; border: 2px solid #bdc3c7; padding: 0.8rem 1.5rem; border-radius: 5px; cursor: pointer; transition: all 0.3s; }
-        .category-btn.active { background: #3498db; color: white; border-color: #2980b9; }
-        .category-btn:hover { background: #d5dbdb; }
+        .category-buttons {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+        .category-btn {
+            background: #DDAACC;
+            border: 2px solid #bb5688;
+            padding: 0.8rem 1.5rem;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s;
+            color: #884499;
+            font-weight: bold;
+        }
+        .category-btn.active {
+            background: #884499;
+            color: white;
+            border-color: #bb5688;
+        }
+        .category-btn:hover {
+            background: #bb5688;
+            color: white;
+        }
 
-        .message { padding: 1rem; border-radius: 5px; margin: 1rem 0; }
-        .error { background: #f8d7da; color: #721c24; }
-        .success { background: #d4edda; color: #155724; }
-        .info { background: #d1ecf1; color: #0c5460; }
+        .message {
+            padding: 1rem;
+            border-radius: 5px;
+            margin: 1rem 0;
+            border-left: 4px solid;
+        }
+        .error {
+            background: #ffebee;
+            color: #c62828;
+            border-left-color: #bb5688;
+        }
+        .success {
+            background: #e8f5e8;
+            color: #2e7d32;
+            border-left-color: #CCAA88;
+        }
+        .info {
+            background: #e3f2fd;
+            color: #1565c0;
+            border-left-color: #8888CC;
+        }
 
-        .loading { text-align: center; padding: 2rem; color: #666; }
+        .loading {
+            text-align: center;
+            padding: 2rem;
+            color: #884499;
+        }
+
+        .event-status {
+            display: inline-block;
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            background: #DDAACC;
+            color: #884499;
+            margin-top: 0.5rem;
+        }
+
+        .form-section {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 2px 5px rgba(136, 68, 153, 0.1);
+            border-left: 4px solid #8888CC;
+        }
+
+        .form-section h3 {
+            color: #884499;
+            margin-bottom: 1rem;
+            border-bottom: 2px solid #DDAACC;
+            padding-bottom: 0.5rem;
+        }
 
         @media (max-width: 768px) {
-            .nav-container { flex-direction: column; gap: 1rem; }
-            .nav-links { flex-wrap: wrap; justify-content: center; }
-            .hero h2 { font-size: 2rem; }
-            .filters { flex-direction: column; }
-            .admin-actions { flex-direction: column; }
-            .form-row { grid-template-columns: 1fr; }
+            .nav-container {
+                flex-direction: column;
+                gap: 1rem;
+            }
+            .nav-links {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+            .hero h2 {
+                font-size: 2rem;
+            }
+            .filters {
+                flex-direction: column;
+            }
+            .admin-actions {
+                flex-direction: column;
+            }
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+            .category-buttons {
+                justify-content: center;
+            }
         }
     </style>
 </head>
@@ -121,17 +427,17 @@
             </div>
         </div>
 
-        <div class="info" style="padding: 1rem; border-radius: 5px; margin: 2rem 0;">
-            <h3>Demo Admin Account</h3>
-            <p><strong>Email:</strong> thehollow2008@gmail.com</p>
-            <p><strong>Password:</strong> NiigoS1tg</p>
-            <p>Use this account to create events and access admin features.</p>
+        <div class="info" style="padding: 1rem; border-radius: 5px; margin: 2rem 0; border-left: 4px solid #CCAA88; background: #f8f4ff;">
+            <h3 style="color: #884499; margin-bottom: 0.5rem;">Demo Admin Account</h3>
+            <p><strong style="color: #bb5688;">Email:</strong> thehollow2008@gmail.com</p>
+            <p><strong style="color: #bb5688;">Password:</strong> NiigoS1tg</p>
+            <p style="margin-top: 0.5rem;">Use this account to create events and access admin features.</p>
         </div>
     </section>
 
     <!-- Events Section -->
     <section id="events" class="section">
-        <h2>All Events</h2>
+        <h2 style="color: #884499; margin-bottom: 1rem;">All Events</h2>
         <div class="filters">
             <input type="text" id="searchInput" placeholder="Search events..." onkeyup="searchEvents()">
             <select id="categoryFilter" onchange="filterEvents()">
@@ -150,89 +456,104 @@
     <!-- Create Event Section -->
     <section id="create-event" class="section">
         <div class="auth-form">
-            <h2>Create New Event</h2>
+            <h2 style="color: #884499; text-align: center; margin-bottom: 2rem;">Create New Event</h2>
             <form onsubmit="createEvent(event)">
-                <div class="form-group">
-                    <label>Event Title *</label>
-                    <input type="text" id="eventTitle" required>
-                </div>
-
-                <div class="form-group">
-                    <label>Description *</label>
-                    <textarea id="eventDescription" required></textarea>
-                </div>
-
-                <div class="form-group">
-                    <label>Category *</label>
-                    <select id="eventCategory" required>
-                        <option value="">Select Category</option>
-                        <option value="Technology">Technology</option>
-                        <option value="Music">Music</option>
-                        <option value="Business">Business</option>
-                        <option value="Sports">Sports</option>
-                        <option value="Education">Education</option>
-                        <option value="Arts">Arts & Culture</option>
-                        <option value="Food">Food & Drink</option>
-                        <option value="Health">Health & Wellness</option>
-                        <option value="Other">Other</option>
-                    </select>
-                </div>
-
-                <div class="form-row">
+                <div class="form-section">
+                    <h3>Event Information</h3>
                     <div class="form-group">
-                        <label>Venue *</label>
-                        <input type="text" id="eventVenue" required>
+                        <label>Event Title</label>
+                        <input type="text" id="eventTitle" required>
                     </div>
+
                     <div class="form-group">
-                        <label>City *</label>
-                        <input type="text" id="eventCity" required>
+                        <label>Description</label>
+                        <textarea id="eventDescription" required></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Category</label>
+                        <select id="eventCategory" required>
+                            <option value="">Select Category</option>
+                            <option value="Technology">Technology</option>
+                            <option value="Music">Music</option>
+                            <option value="Business">Business</option>
+                            <option value="Sports">Sports</option>
+                            <option value="Education">Education</option>
+                            <option value="Arts">Arts & Culture</option>
+                            <option value="Food">Food & Drink</option>
+                            <option value="Health">Health & Wellness</option>
+                            <option value="Other">Other</option>
+                        </select>
                     </div>
                 </div>
 
-                <div class="form-group">
-                    <label>Country *</label>
-                    <input type="text" id="eventCountry" required>
-                </div>
+                <div class="form-section">
+                    <h3>Location Details</h3>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Venue</label>
+                            <input type="text" id="eventVenue" required>
+                        </div>
+                        <div class="form-group">
+                            <label>City</label>
+                            <input type="text" id="eventCity" required>
+                        </div>
+                    </div>
 
-                <div class="form-row">
                     <div class="form-group">
-                        <label>Start Date & Time *</label>
-                        <input type="datetime-local" id="eventStartDate" required>
-                    </div>
-                    <div class="form-group">
-                        <label>End Date & Time *</label>
-                        <input type="datetime-local" id="eventEndDate" required>
-                    </div>
-                </div>
-
-                <div class="form-row">
-                    <div class="form-group">
-                        <label>Organizer Name *</label>
-                        <input type="text" id="organizerName" required>
-                    </div>
-                    <div class="form-group">
-                        <label>Organizer Email *</label>
-                        <input type="email" id="organizerEmail" required>
+                        <label>Country</label>
+                        <input type="text" id="eventCountry" required>
                     </div>
                 </div>
 
-                <div class="form-group">
-                    <label>Organizer Phone *</label>
-                    <input type="tel" id="organizerPhone" required>
-                </div>
-
-                <div class="form-row">
-                    <div class="form-group">
-                        <label>Capacity *</label>
-                        <input type="number" id="eventCapacity" min="1" required>
-                    </div>
-                    <div class="form-group">
-                        <label>Ticket Price ($) *</label>
-                        <input type="number" id="eventPrice" min="0" step="0.01" required>
+                <div class="form-section">
+                    <h3>Date & Time</h3>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Start Date & Time</label>
+                            <input type="datetime-local" id="eventStartDate" required>
+                        </div>
+                        <div class="form-group">
+                            <label>End Date & Time</label>
+                            <input type="datetime-local" id="eventEndDate" required>
+                        </div>
                     </div>
                 </div>
 
-                <button type="submit" class="btn-success">Create Event</button>
+                <div class="form-section">
+                    <h3>Organizer Information</h3>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Organizer Name</label>
+                            <input type="text" id="organizerName" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Organizer Email</label>
+                            <input type="email" id="organizerEmail" required>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Organizer Phone</label>
+                        <input type="tel" id="organizerPhone" required>
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <h3>Event Capacity & Pricing</h3>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Capacity</label>
+                            <input type="number" id="eventCapacity" min="1" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Ticket Price ($)</label>
+                            <input type="number" id="eventPrice" min="0" step="0.01" required>
+                        </div>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn-success" style="width: 100%; padding: 1rem; font-size: 1.1rem;">Create Event</button>
             </form>
         </div>
     </section>
@@ -240,24 +561,24 @@
     <!-- Login Section -->
     <section id="login" class="section">
         <div class="auth-form">
-            <h2>Login</h2>
+            <h2 style="color: #884499; text-align: center; margin-bottom: 2rem;">Login</h2>
             <form onsubmit="loginUser(event)">
                 <div class="form-group">
-                    <label>Email:</label>
+                    <label>Email</label>
                     <input type="email" id="loginEmail" required>
                 </div>
                 <div class="form-group">
-                    <label>Password:</label>
+                    <label>Password</label>
                     <input type="password" id="loginPassword" required>
                 </div>
-                <button type="submit" class="btn-primary">Login</button>
+                <button type="submit" class="btn-primary" style="width: 100%; padding: 1rem; font-size: 1.1rem;">Login</button>
             </form>
-            <p>Don't have an account? <a href="#" onclick="showSection('register')">Register here</a></p>
+            <p style="text-align: center; margin-top: 1rem;">Don't have an account? <a href="#" onclick="showSection('register')" style="color: #884499;">Register here</a></p>
 
-            <div class="info" style="margin-top: 2rem; padding: 1rem;">
-                <h4>Demo Admin Account:</h4>
-                <p><strong>Email:</strong> thehollow2008@gmail.com</p>
-                <p><strong>Password:</strong> NiigoS1tg</p>
+            <div class="info" style="margin-top: 2rem; padding: 1rem; border-left: 4px solid #CCAA88; background: #f8f4ff;">
+                <h4 style="color: #884499; margin-bottom: 0.5rem;">Demo Admin Account</h4>
+                <p><strong style="color: #bb5688;">Email:</strong> thehollow2008@gmail.com</p>
+                <p><strong style="color: #bb5688;">Password:</strong> NiigoS1tg</p>
             </div>
         </div>
     </section>
@@ -265,25 +586,25 @@
     <!-- Register Section -->
     <section id="register" class="section">
         <div class="auth-form">
-            <h2>Register</h2>
+            <h2 style="color: #884499; text-align: center; margin-bottom: 2rem;">Register</h2>
             <form onsubmit="registerUser(event)">
                 <div class="form-group">
-                    <label>Name:</label>
+                    <label>Name</label>
                     <input type="text" id="registerName" required>
                 </div>
                 <div class="form-group">
-                    <label>Email:</label>
+                    <label>Email</label>
                     <input type="email" id="registerEmail" required>
                 </div>
                 <div class="form-group">
-                    <label>Password:</label>
+                    <label>Password</label>
                     <input type="password" id="registerPassword" required minlength="6">
                 </div>
                 <div class="form-group">
-                    <label>Phone:</label>
+                    <label>Phone</label>
                     <input type="tel" id="registerPhone">
                 </div>
-                <button type="submit" class="btn-primary">Register</button>
+                <button type="submit" class="btn-primary" style="width: 100%; padding: 1rem; font-size: 1.1rem;">Register</button>
             </form>
         </div>
     </section>
@@ -291,10 +612,10 @@
     <!-- Profile Section -->
     <section id="profile" class="section">
         <div class="profile-container">
-            <h2>My Profile</h2>
+            <h2 style="color: #884499; margin-bottom: 1rem;">My Profile</h2>
             <div id="profileInfo"></div>
             <div id="userTickets">
-                <h3>My Tickets</h3>
+                <h3 style="color: #884499; margin-bottom: 1rem;">My Tickets</h3>
                 <div id="ticketsList"></div>
             </div>
         </div>
@@ -303,7 +624,7 @@
     <!-- Admin Section -->
     <section id="admin" class="section">
         <div class="admin-container">
-            <h2>Admin Dashboard</h2>
+            <h2 style="color: #884499; margin-bottom: 1rem;">Admin Dashboard</h2>
             <div class="admin-stats" id="adminStats"></div>
             <div class="admin-actions">
                 <button class="btn-primary" onclick="loadAdminStats()">Refresh Stats</button>
@@ -521,7 +842,7 @@
                     <div class="loading">
                         <p>No events found. Create some events to get started!</p>
                         ${currentUser?.role === 'admin' ?
-                '<button class="btn-success" onclick="showSection(\'create-event\')">Create Event</button>' :
+                '<button class="btn-success" onclick="showSection(\'create-event\')" style="margin-top: 1rem;">Create Event</button>' :
                 '<p>Contact administrator to add events.</p>'
             }
                     </div>
@@ -620,12 +941,12 @@
         const user = profileData.user;
         profileInfo.innerHTML = `
                 <div class="profile-info">
-                    <h3>Personal Information</h3>
-                    <p><strong>Name:</strong> ${user.name}</p>
-                    <p><strong>Email:</strong> ${user.email}</p>
-                    <p><strong>Role:</strong> ${user.role}</p>
-                    ${user.phone ? `<p><strong>Phone:</strong> ${user.phone}</p>` : ''}
-                    <p><strong>Total Tickets:</strong> ${profileData.ticketStats.totalTickets}</p>
+                    <h3 style="color: #884499; margin-bottom: 1rem;">Personal Information</h3>
+                    <p><strong style="color: #bb5688;">Name:</strong> ${user.name}</p>
+                    <p><strong style="color: #bb5688;">Email:</strong> ${user.email}</p>
+                    <p><strong style="color: #bb5688;">Role:</strong> ${user.role}</p>
+                    ${user.phone ? `<p><strong style="color: #bb5688;">Phone:</strong> ${user.phone}</p>` : ''}
+                    <p><strong style="color: #bb5688;">Total Tickets:</strong> ${profileData.ticketStats.totalTickets}</p>
                 </div>
             `;
     }
@@ -669,10 +990,10 @@
         // Display events by category
         const adminData = document.getElementById('adminData');
         adminData.innerHTML = `
-                <h3>Events by Category</h3>
+                <h3 style="color: #884499; margin-bottom: 1rem;">Events by Category</h3>
                 ${stats.eventsByCategory.map(cat => `
-                    <div style="margin: 0.5rem 0; padding: 0.5rem; background: #f8f9fa; border-radius: 5px;">
-                        <strong>${cat._id}:</strong> ${cat.count} events
+                    <div style="margin: 0.5rem 0; padding: 0.5rem; background: #f8f4ff; border-radius: 5px; border-left: 3px solid #8888CC;">
+                        <strong style="color: #884499;">${cat._id}:</strong> ${cat.count} events
                     </div>
                 `).join('')}
             `;
@@ -685,11 +1006,11 @@
             if (data.success) {
                 const adminData = document.getElementById('adminData');
                 adminData.innerHTML = `
-                        <h3>Top 5 Most Registered Events</h3>
+                        <h3 style="color: #884499; margin-bottom: 1rem;">Top 5 Most Registered Events</h3>
                         ${data.data.length > 0 ? data.data.map((event, index) => `
-                            <div style="margin: 1rem 0; padding: 1rem; background: #f8f9fa; border-radius: 5px;">
-                                <h4>#${index + 1} - ${event.eventName}</h4>
-                                <p>Registrations: ${event.totalRegistrations}</p>
+                            <div style="margin: 1rem 0; padding: 1rem; background: #f8f4ff; border-radius: 5px; border-left: 3px solid #CCAA88;">
+                                <h4 style="color: #884499; margin-bottom: 0.5rem;">#${index + 1} - ${event.eventName}</h4>
+                                <p><strong style="color: #bb5688;">Registrations:</strong> ${event.totalRegistrations}</p>
                             </div>
                         `).join('') : '<p>No registration data available yet.</p>'}
                     `;

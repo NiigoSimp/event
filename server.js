@@ -6,7 +6,6 @@ const cors = require('cors');
 const path = require('path');
 
 const app = express();
-const PORT = process.env.PORT || 3000;
 
 // Middleware
 app.use(cors());
@@ -751,8 +750,6 @@ app.get('/api/events/categories/with-count', async (req, res) => {
     }
 });
 
-// ==================== ADDITIONAL ROUTES ====================
-
 // Auth Routes
 app.post('/api/auth/register', async (req, res) => {
     try {
@@ -991,10 +988,5 @@ app.get('*', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
-// Start server
-app.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`);
-    console.log(`Frontend: http://localhost:${PORT}`);
-    console.log(`API: http://localhost:${PORT}/api`);
-
-});
+// Export for Vercel
+module.exports = app;

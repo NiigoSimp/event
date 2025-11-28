@@ -1,5 +1,0 @@
-[phases.setup]
-cmds = ["npm ci"]
-
-[start]
-cmd = "npm start"
